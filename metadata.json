@@ -1,0 +1,5 @@
+{
+  "name": "Musaix Pro 2026",
+  "description": "An AI-powered music creation platform that generates lyrics, composition data, and album art using Gemini 2.5 and 3.0 models.",
+  "requestFramePermissions": []
+}
