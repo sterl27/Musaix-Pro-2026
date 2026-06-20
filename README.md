@@ -1,20 +1,53 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Musaix Pro 2026
 
-# Run and deploy your AI Studio app
+Musaix Canvas v0.1 is locked to a small production path:
 
-This contains everything you need to run your app locally.
+```txt
+Reference → Prompt → Project → Export
+```
 
-View your app in AI Studio: https://ai.studio/apps/drive/1h4C8SryRc6WkhOaS1qEMn_A2ifF3FvXi
+No agent swarm yet. No Pinecone, Chroma, Spotify OAuth, Ableton bridge, Google Drive sync, or multi-agent orchestration.
 
-## Run Locally
+## Stack
 
-**Prerequisites:**  Node.js
+- Next.js App Router
+- React
+- Tailwind CSS
+- Supabase
+- Vercel AI Gateway
 
+## Routes
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+- `/` — launch page
+- `/canvas` — Musaix Canvas
+- `/api/generate-prompt` — structured prompt generation route
+
+## Environment
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+AI_GATEWAY_API_KEY=
+```
+
+## Supabase
+
+Apply `supabase/schema.sql` to the active Supabase project:
+
+```txt
+xexzplnyzblflucfvbwt
+```
+
+Tables:
+
+- `projects`
+- `references`
+- `prompts`
+- `exports`
+
+## Local Dev
+
+```bash
+npm install
+npm run dev
+```
