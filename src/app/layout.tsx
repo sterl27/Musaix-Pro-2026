@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Musaix Canvas',
-  description: 'Reference to prompt to project to export workflow for Musaix Pro.'
+  title: 'Musaix Pro',
+  description: 'Musaix Pro studio cockpit, canvas workflow, and audio intelligence shell.'
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
