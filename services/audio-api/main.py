@@ -6,10 +6,27 @@ from typing import Any
 
 import librosa
 import numpy as np
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, HTTPException, UploadFile, status
 from pydantic import BaseModel
 
 app = FastAPI(title="Musaix Audio API", version="0.1.0")
+
+UPLOAD_CHUNK_BYTES = 1024 * 1024
+MAX_UPLOAD_BYTES = 250 * 1024 * 1024
+ALLOWED_AUDIO_TYPES = {
+    "audio/aac",
+    "audio/flac",
+    "audio/m4a",
+    "audio/mp4",
+    "audio/mpeg",
+    "audio/ogg",
+    "audio/opus",
+    "audio/wav",
+    "audio/webm",
+    "audio/x-flac",
+    "audio/x-m4a",
+    "audio/x-wav",
+}
 
 
 class AnalysisResponse(BaseModel):
@@ -26,16 +43,49 @@ def health() -> dict[str, str]:
 
 @app.post("/analyze", response_model=AnalysisResponse)
 async def analyze_audio(file: UploadFile = File(...)) -> AnalysisResponse:
-    suffix = Path(file.filename or "audio.wav").suffix or ".wav"
+    if file.content_type and file.content_type not in ALLOWED_AUDIO_TYPES:
+        raise HTTPException(
+            status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+            detail="Unsupported audio media type",
+        )
 
-    with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
-        tmp.write(await file.read())
-        tmp_path = Path(tmp.name)
+    suffix = Path(file.filename or "audio.wav").suffix or ".wav"
+    tmp_path: Path | None = None
 
     try:
-        y, sr = librosa.load(tmp_path, sr=None, mono=True)
-        duration = float(librosa.get_duration(y=y, sr=sr))
+        uploaded_bytes = 0
+        with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+            tmp_path = Path(tmp.name)
+            while chunk := await file.read(UPLOAD_CHUNK_BYTES):
+                uploaded_bytes += len(chunk)
+                if uploaded_bytes > MAX_UPLOAD_BYTES:
+                    raise HTTPException(
+                        status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                        detail="Audio upload exceeds the 250 MB limit",
+                    )
+                tmp.write(chunk)
 
+        if uploaded_bytes == 0:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Audio upload is empty",
+            )
+
+        try:
+            y, sr = librosa.load(tmp_path, sr=None, mono=True)
+        except (EOFError, OSError, RuntimeError, ValueError) as exc:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Audio file could not be decoded",
+            ) from exc
+
+        if y.size == 0:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Audio file contains no decodable samples",
+            )
+
+        duration = float(librosa.get_duration(y=y, sr=sr))
         rms = librosa.feature.rms(y=y)[0]
         zcr = librosa.feature.zero_crossing_rate(y)[0]
         centroid = librosa.feature.spectral_centroid(y=y, sr=sr)[0]
@@ -60,4 +110,5 @@ async def analyze_audio(file: UploadFile = File(...)) -> AnalysisResponse:
             metrics=metrics,
         )
     finally:
-        tmp_path.unlink(missing_ok=True)
+        if tmp_path is not None:
+            tmp_path.unlink(missing_ok=True)
