@@ -22,3 +22,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Next.js and test output
+.next/
+next-env.d.ts
+*.tsbuildinfo
+test-results/
+playwright-report/
+.superpowers/
