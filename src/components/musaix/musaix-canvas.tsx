@@ -1,16 +1,21 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { ActionPanel } from './action-panel';
 import { PromptEditor } from './prompt-editor';
 import { ReferenceQueue } from './reference-queue';
 import {
+  CanvasError,
+  type CanvasSession,
   createProject,
+  describeCanvasError,
   listReferences,
   loadLatestProject,
   saveMarkdownExport,
   savePromptSet,
-  saveReferenceCard
+  saveReferenceCard,
+  watchCanvasSession
 } from '@/lib/musaix/canvas-db';
 import { exportPromptMarkdown } from '@/lib/musaix/export-markdown';
 import type { CanvasStatus, Project, PromptSet, ReferenceCard, SourceType } from '@/lib/musaix/types';
@@ -80,11 +85,35 @@ export function MusaixCanvas() {
   const [prompt, setPrompt] = useState<PromptSet>(fallbackPrompt(seedReference));
   const [status, setStatus] = useState('Ready. Reference → Prompt → Project → Export.');
   const [mode, setMode] = useState<CanvasStatus>('ready');
+  const [session, setSession] = useState<CanvasSession | null>(null);
 
   const canSavePrompt = useMemo(() => Boolean(prompt.style_prompt && prompt.structure_prompt), [prompt]);
   const promptSaved = Boolean(prompt.id);
+  const sessionStatus = session?.status;
+  const sessionUserId = session?.userId;
+  const canPersist = sessionStatus === 'signed-in';
 
   useEffect(() => {
+    let current = '';
+    return watchCanvasSession((next) => {
+      // Token refreshes repeat the same account; only a real account change resets the canvas.
+      const key = `${next.status}:${next.userId ?? ''}`;
+      if (key === current) return;
+      current = key;
+
+      // Rows are owner-scoped: never carry one account's project or references into another session.
+      setProject(null);
+      setReferences([seedReference]);
+      setSelectedReference(seedReference);
+      setPrompt((draft) => ({ ...draft, id: undefined, projectId: null, referenceId: seedReference.id }));
+      if (next.status === 'unconfigured') setStatus(describeCanvasError(new CanvasError('config', 'Supabase is not configured.')));
+      if (next.status === 'signed-out') setStatus('Signed out. Sign in to load and save canvas work; until then edits stay in this tab only.');
+      setSession(next);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (sessionStatus !== 'signed-in') return;
     let live = true;
 
     async function loadCanvas() {
@@ -108,10 +137,10 @@ export function MusaixCanvas() {
           setMood(referenceRows[0].mood ?? '');
           setConstraints(referenceRows[0].constraints ?? '');
           setPrompt(fallbackPrompt(referenceRows[0]));
-          setStatus('Supabase loaded. Canvas is wired.');
         }
-      } catch {
-        if (live) setStatus('Running with local seed. Add Supabase env vars to enable persistence.');
+        setStatus(referenceRows.length > 0 ? 'Supabase loaded. Canvas is wired.' : 'Signed in. No saved references yet.');
+      } catch (error) {
+        if (live) setStatus(`Saved canvas work could not be loaded. ${describeCanvasError(error)}`);
       }
     }
 
@@ -119,7 +148,7 @@ export function MusaixCanvas() {
     return () => {
       live = false;
     };
-  }, []);
+  }, [sessionStatus, sessionUserId]);
 
   function selectReference(reference: ReferenceCard) {
     setSelectedReference(reference);
@@ -167,22 +196,8 @@ export function MusaixCanvas() {
       setSelectedReference(reference);
       setPrompt(fallbackPrompt(reference));
       setStatus('Reference saved to Supabase.');
-    } catch {
-      const localReference: ReferenceCard = {
-        id: crypto.randomUUID(),
-        title: title || 'Untitled Reference',
-        artist,
-        sourceType,
-        sourceText,
-        mood,
-        constraints,
-        tags: [sourceType, mood].filter(Boolean)
-      };
-
-      setReferences((current) => [localReference, ...current]);
-      setSelectedReference(localReference);
-      setPrompt(fallbackPrompt(localReference));
-      setStatus('Reference saved locally. Supabase write failed or env vars are missing.');
+    } catch (error) {
+      setStatus(`Reference not saved. ${describeCanvasError(error)}`);
     } finally {
       setMode('ready');
     }
@@ -239,8 +254,8 @@ export function MusaixCanvas() {
       });
       setPrompt(saved);
       setStatus('Prompt set saved to Supabase.');
-    } catch {
-      setStatus('Prompt remains local. Supabase write failed or env vars are missing.');
+    } catch (error) {
+      setStatus(`Prompt set not saved. ${describeCanvasError(error)}`);
     } finally {
       setMode('ready');
     }
@@ -260,10 +275,11 @@ export function MusaixCanvas() {
     URL.revokeObjectURL(url);
 
     try {
+      if (!canPersist) throw new CanvasError(sessionStatus === 'unconfigured' ? 'config' : 'signed-out', 'Export record requires a session.');
       await saveMarkdownExport({ projectId: project?.id, promptId: prompt.id, filename, content: markdown });
       setStatus('Markdown exported and export row saved.');
-    } catch {
-      setStatus('Markdown downloaded locally. Export row not saved.');
+    } catch (error) {
+      setStatus(`Markdown downloaded; export record not saved. ${describeCanvasError(error)}`);
     } finally {
       setMode('ready');
     }
@@ -281,6 +297,11 @@ export function MusaixCanvas() {
             </div>
             <div className="rounded-2xl border border-zinc-800 bg-zinc-950/80 px-4 py-3 text-sm text-zinc-400">
               Supabase: <span className="text-cyan-300">xexzplnyzblflucfvbwt</span>
+              {sessionStatus === 'signed-out' ? (
+                <Link href="/audio" className="ml-3 font-semibold text-pink-400 hover:text-pink-300">
+                  Sign in to save →
+                </Link>
+              ) : null}
             </div>
           </div>
         </header>
@@ -351,6 +372,7 @@ export function MusaixCanvas() {
             status={status}
             mode={mode}
             canSavePrompt={canSavePrompt}
+            canPersist={canPersist}
             project={project}
             selectedReference={selectedReference}
             referenceCount={references.length}
