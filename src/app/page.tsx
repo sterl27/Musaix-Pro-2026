@@ -8,6 +8,7 @@ export default function HomePage() {
         <h1 className="mt-4 text-5xl font-black uppercase tracking-tight text-white">Audioweaver cockpit is live.</h1>
         <p className="mt-4 text-zinc-400">Studio is the operating shell. Canvas remains locked to Reference → Prompt → Project → Export.</p>
         <div className="mt-7 flex flex-wrap gap-3">
+          <Link href="/audio" className="inline-flex rounded-xl bg-[#ee2b5b] px-5 py-3 text-sm font-bold text-white">Open Audio</Link>
           <Link href="/studio" className="inline-flex rounded-xl bg-[#ffb26f] px-5 py-3 text-sm font-black uppercase tracking-widest text-black hover:bg-[#ffd19d]">
             Open Studio
           </Link>

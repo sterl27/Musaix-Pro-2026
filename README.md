@@ -136,3 +136,13 @@ uvicorn main:app --reload --port 8080
 6. Render waveform, spectral, chroma, and metric cards.
 7. Generate Gemini/OpenAI summary from verified metrics.
 8. Export JSON/PDF reports.
+
+## Persistent audio workspace
+
+Open `/audio` (also available from the home page and player dock). Drop one WAV/MP3, up to 100 MiB, for local playback. The single global player keeps its queue, time, volume and playback across client-side navigation to Studio and Canvas. Local files are not uploaded until **Save to library** is selected.
+
+Configure the existing `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, then sign in with an existing email/password account to save tracks. The repository uses the existing private `musaix-audio` bucket and `musaix_tracks`; it does not create a second catalog or use service-role credentials. Signed playback links last 15 minutes and are renewed on expiry after rechecking ownership. Signing out/account changes clear private playback and queued private tracks.
+
+Use Node.js 22+ and `npm ci`. Verify with `npm run test:run`, `npm run typecheck`, `npm run lint`, and `npm run build`. For real media/navigation tests: `npx playwright install chromium`, `npm run build`, then `npm run test:e2e`. Tests generate an in-memory WAV; no private music is committed.
+
+The Next application lives in `src/`; legacy standalone demo files at the root are preserved but excluded from its typecheck. Metering, MIR reports, stems and agent interpretation remain later milestones. See `docs/audio-runtime-verification.md` for measured checks and limits.
