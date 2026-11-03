@@ -189,7 +189,7 @@ export default function StudioPage() {
                 <span>Search...</span>
               </div>
               <div className="mt-4 divide-y divide-[#3c332b] border-y border-[#3c332b]">
-                {patches.map(([name, desc, rating], index) => (
+                {patches.map(([name, desc, rating]) => (
                   <button key={name} className="grid w-full grid-cols-[52px_1fr_auto] items-center gap-4 py-3 text-left hover:bg-[#241f1a]">
                     <span className="grid h-12 w-12 place-items-center rounded-md border border-[#322b25] bg-[radial-gradient(circle_at_35%_35%,rgba(158,237,129,0.55),rgba(31,35,30,0.9))] text-[#e9d7a8]">
                       <Sparkles className="h-5 w-5" />
