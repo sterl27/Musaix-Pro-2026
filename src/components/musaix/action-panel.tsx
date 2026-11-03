@@ -4,6 +4,7 @@ type ActionPanelProps = {
   status: string;
   mode: CanvasStatus;
   canSavePrompt: boolean;
+  canPersist: boolean;
   project: Project | null;
   selectedReference: ReferenceCard | null;
   referenceCount: number;
@@ -18,6 +19,7 @@ export function ActionPanel({
   status,
   mode,
   canSavePrompt,
+  canPersist,
   project,
   selectedReference,
   referenceCount,
@@ -51,7 +53,7 @@ export function ActionPanel({
       </div>
 
       <div className="grid gap-3">
-        <button type="button" onClick={onSaveReference} disabled={busy} className="rounded-xl bg-zinc-100 px-4 py-3 text-sm font-semibold text-zinc-950 hover:bg-white disabled:cursor-not-allowed disabled:opacity-40">
+        <button type="button" onClick={onSaveReference} disabled={!canPersist || busy} className="rounded-xl bg-zinc-100 px-4 py-3 text-sm font-semibold text-zinc-950 hover:bg-white disabled:cursor-not-allowed disabled:opacity-40">
           Save Reference
         </button>
         <button type="button" onClick={onGeneratePrompt} disabled={busy} className="rounded-xl bg-pink-600 px-4 py-3 text-sm font-semibold text-white hover:bg-pink-500 disabled:cursor-not-allowed disabled:opacity-40">
@@ -60,7 +62,7 @@ export function ActionPanel({
         <button
           type="button"
           onClick={onSavePrompt}
-          disabled={!canSavePrompt || busy}
+          disabled={!canPersist || !canSavePrompt || busy}
           className="rounded-xl bg-violet-600 px-4 py-3 text-sm font-semibold text-white hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-40"
         >
           Save Prompt
