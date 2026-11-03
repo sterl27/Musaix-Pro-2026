@@ -1,0 +1,570 @@
+{
+  "version": "0.2.0",
+  "exported_at": "2026-10-24T22:32:41.899Z",
+  "presets": [
+    {
+      "preset_id": "cold_case",
+      "display_name": "Cold Case",
+      "tagline": "90s East Coast detective noir boom bap",
+      "default_family": "boom_bap",
+      "style_name": "dark East Coast boom bap",
+      "region": "East Coast",
+      "era": "90s",
+      "tempo": 92,
+      "energy": "dark",
+      "mood": "cold case detective atmosphere",
+      "drums": "punchy kick and snare",
+      "bass": "walking bassline",
+      "instrumentation": "dusty vinyl jazz sample",
+      "vocal_delivery": "gritty male storytelling rap",
+      "song_section_focus": "narrative verse focus",
+      "mix_texture": "raw analog mix",
+      "exclude_styles": "EDM drop, hyperpop, country, polished pop vocals, tropical house",
+      "canonical_prompt": "dark East Coast boom bap, dusty vinyl jazz sample, punchy kick and snare, walking bassline, gritty male storytelling rap, cold case detective atmosphere, raw analog mix"
+    },
+    {
+      "preset_id": "blue_king",
+      "display_name": "Blue King",
+      "tagline": "Royal legacy orchestral street anthem",
+      "default_family": "trap",
+      "style_name": "orchestral trap rap",
+      "region": "Atlanta",
+      "era": "modern",
+      "tempo": 140,
+      "energy": "luxury",
+      "mood": "royal legacy mood",
+      "drums": "crisp rolling trap hi-hats and hard snare",
+      "bass": "booming 808 sub bass",
+      "instrumentation": "dramatic strings, dark piano chords",
+      "vocal_delivery": "confident male melodic rap",
+      "song_section_focus": "anthemic hook and verse",
+      "mix_texture": "cinematic street anthem mix",
+      "exclude_styles": "happy pop, acoustic folk, bright dance pop, children's music, upbeat reggae",
+      "canonical_prompt": "orchestral trap rap, booming 808 sub bass, dramatic strings, dark piano chords, confident male melodic rap, royal legacy mood, cinematic street anthem mix"
+    },
+    {
+      "preset_id": "rabbit_skin",
+      "display_name": "Rabbit Skin",
+      "tagline": "Haunted backwoods gothic trap",
+      "default_family": "dark_rap",
+      "style_name": "gothic rap",
+      "region": "Memphis",
+      "era": "modern",
+      "tempo": 134,
+      "energy": "dark",
+      "mood": "haunted backwoods atmosphere",
+      "drums": "heavy trap drums",
+      "bass": "distorted 808 bass",
+      "instrumentation": "eerie choir pads",
+      "vocal_delivery": "raspy male rap vocals",
+      "song_section_focus": "tense intro and aggressive verse",
+      "mix_texture": "dark cinematic mix",
+      "exclude_styles": "happy pop, acoustic folk, bright dance pop, children's music, upbeat reggae",
+      "canonical_prompt": "gothic rap, eerie choir pads, heavy trap drums, distorted 808 bass, raspy male rap vocals, haunted backwoods atmosphere, dark cinematic mix"
+    },
+    {
+      "preset_id": "gas_fee",
+      "display_name": "Gas Fee",
+      "tagline": "Luxury tech hustle Atlanta club trap",
+      "default_family": "trap",
+      "style_name": "modern Atlanta trap rap",
+      "region": "Atlanta",
+      "era": "modern",
+      "tempo": 146,
+      "energy": "luxury",
+      "mood": "luxury tech hustle mood",
+      "drums": "crisp hi-hats",
+      "bass": "deep 808 bass",
+      "instrumentation": "icy synth bells",
+      "vocal_delivery": "melodic autotune hook",
+      "song_section_focus": "catchy melodic hook",
+      "mix_texture": "polished club mix",
+      "exclude_styles": "acoustic folk, country ballad, children's music, vintage jazz",
+      "canonical_prompt": "modern Atlanta trap rap, crisp hi-hats, deep 808 bass, icy synth bells, melodic autotune hook, luxury tech hustle mood, polished club mix"
+    },
+    {
+      "preset_id": "sacred_sin",
+      "display_name": "Sacred Sin",
+      "tagline": "Redemption and regret gospel boom bap",
+      "default_family": "conscious_rap",
+      "style_name": "spiritual conscious rap",
+      "region": "Chicago",
+      "era": "2000s",
+      "tempo": 88,
+      "energy": "emotional",
+      "mood": "redemption and regret atmosphere",
+      "drums": "warm boom bap drums",
+      "bass": "deep bass",
+      "instrumentation": "soulful gospel chords",
+      "vocal_delivery": "emotional male rap vocals",
+      "song_section_focus": "confessional storytelling verse",
+      "mix_texture": "intimate analog mix",
+      "exclude_styles": "violent horrorcore, club EDM, novelty rap, comedy vocals, bubblegum pop",
+      "canonical_prompt": "spiritual conscious rap, soulful gospel chords, warm boom bap drums, deep bass, emotional male rap vocals, redemption and regret atmosphere, intimate analog mix"
+    },
+    {
+      "preset_id": "ethereum_chain_talk",
+      "display_name": "Ethereum Chain Talk",
+      "tagline": "Futuristic neon synth arpeggio trap",
+      "default_family": "trap",
+      "style_name": "futuristic trap rap",
+      "region": "Atlanta",
+      "era": "modern",
+      "tempo": 142,
+      "energy": "aggressive",
+      "mood": "crypto-night hustle atmosphere",
+      "drums": "crisp 808 drums",
+      "bass": "deep sub bass",
+      "instrumentation": "digital synth arpeggios",
+      "vocal_delivery": "confident melodic rap vocals",
+      "song_section_focus": "high-energy verse and hook",
+      "mix_texture": "polished neon mix",
+      "exclude_styles": "acoustic folk, country rock, children's music, traditional blues",
+      "canonical_prompt": "futuristic trap rap, digital synth arpeggios, crisp 808 drums, deep sub bass, confident melodic rap vocals, crypto-night hustle atmosphere, polished neon mix"
+    }
+  ],
+  "styles": [
+    {
+      "style_id": "boom_bap_ny_90s",
+      "style_name": "East Coast boom bap",
+      "style_family": "boom_bap",
+      "region": "East Coast",
+      "era": "90s",
+      "tempo_min": 86,
+      "tempo_max": 96,
+      "energy": "dark",
+      "mood": [
+        "cold city night atmosphere",
+        "underground",
+        "gritty"
+      ],
+      "vocal_delivery": [
+        "gritty male storytelling rap",
+        "lyrical multisyllabic flow"
+      ],
+      "drums": [
+        "punchy kick and snare",
+        "MPC swing boom bap drums"
+      ],
+      "bass": [
+        "warm upright bass",
+        "walking bassline"
+      ],
+      "instrumentation": [
+        "dusty vinyl soul sample",
+        "jazzy Rhodes loop"
+      ],
+      "mix_texture": "raw analog mix",
+      "platform_hint": "Suno / Udio / MusicGen",
+      "exclude_styles": [
+        "EDM drop",
+        "hyperpop",
+        "country",
+        "tropical house"
+      ],
+      "quality_score": 97,
+      "tags": [
+        "boom bap",
+        "east coast",
+        "90s",
+        "vinyl",
+        "storytelling"
+      ],
+      "notes": "Golden-era New York sample aesthetic with unquantized drum swing."
+    },
+    {
+      "style_id": "trap_memphis_dark",
+      "style_name": "dark Memphis trap",
+      "style_family": "trap",
+      "region": "Memphis",
+      "era": "modern",
+      "tempo_min": 130,
+      "tempo_max": 150,
+      "energy": "aggressive",
+      "mood": [
+        "gritty street atmosphere",
+        "dark",
+        "haunted"
+      ],
+      "vocal_delivery": [
+        "aggressive male rap vocals",
+        "triplet flow"
+      ],
+      "drums": [
+        "crisp triplet hi-hats",
+        "hard punchy snare"
+      ],
+      "bass": [
+        "heavy 808 sub bass"
+      ],
+      "instrumentation": [
+        "haunting piano loop",
+        "dark minor strings"
+      ],
+      "mix_texture": "cinematic mix",
+      "platform_hint": "Suno / Udio",
+      "exclude_styles": [
+        "happy pop",
+        "acoustic folk",
+        "tropical house"
+      ],
+      "quality_score": 95,
+      "tags": [
+        "trap",
+        "memphis",
+        "dark",
+        "808",
+        "triplet"
+      ],
+      "notes": "High-tension minor piano melodies over booming sub-bass."
+    },
+    {
+      "style_id": "drill_uk_dark",
+      "style_name": "UK drill",
+      "style_family": "drill",
+      "region": "UK",
+      "era": "modern",
+      "tempo_min": 140,
+      "tempo_max": 146,
+      "energy": "aggressive",
+      "mood": [
+        "cold urban tension",
+        "nocturnal street atmosphere"
+      ],
+      "vocal_delivery": [
+        "aggressive baritone drill flow",
+        "syncopated UK pocket"
+      ],
+      "drums": [
+        "syncopated drill hi-hats",
+        "snappy rimshot snare"
+      ],
+      "bass": [
+        "sliding 808 glides"
+      ],
+      "instrumentation": [
+        "minor orchestral string loop",
+        "reversed dark piano"
+      ],
+      "mix_texture": "punchy low-end master",
+      "platform_hint": "Suno / Udio / Stable Audio",
+      "exclude_styles": [
+        "lo-fi chillhop",
+        "soft acoustic ballad",
+        "funk pop",
+        "reggae"
+      ],
+      "quality_score": 96,
+      "tags": [
+        "drill",
+        "uk",
+        "sliding 808",
+        "strings"
+      ],
+      "notes": "Signature 3-3-2 hi-hat cadence and wide pitch-gliding 808 bass."
+    },
+    {
+      "style_id": "phonk_memphis_tape",
+      "style_name": "Memphis phonk",
+      "style_family": "phonk",
+      "region": "Memphis",
+      "era": "90s",
+      "tempo_min": 115,
+      "tempo_max": 145,
+      "energy": "dark",
+      "mood": [
+        "haunted",
+        "underground",
+        "nocturnal drift"
+      ],
+      "vocal_delivery": [
+        "pitched-down Memphis vocal chop",
+        "low raspy flow"
+      ],
+      "drums": [
+        "lo-fi 808 cowbell percussion",
+        "crunchy tape trap drums"
+      ],
+      "bass": [
+        "distorted 808 bass"
+      ],
+      "instrumentation": [
+        "808 cowbell melody",
+        "eerie synth lead"
+      ],
+      "mix_texture": "gritty underground cassette",
+      "platform_hint": "Suno / MusicGen",
+      "exclude_styles": [
+        "bright pop",
+        "acoustic folk",
+        "clean orchestral"
+      ],
+      "quality_score": 94,
+      "tags": [
+        "phonk",
+        "memphis",
+        "cowbell",
+        "cassette"
+      ],
+      "notes": "Four-track tape saturation with iconic cowbell lead."
+    },
+    {
+      "style_id": "gfunk_west_coast_90s",
+      "style_name": "West Coast G-Funk",
+      "style_family": "g_funk",
+      "region": "West Coast",
+      "era": "90s",
+      "tempo_min": 90,
+      "tempo_max": 100,
+      "energy": "chill",
+      "mood": [
+        "sun-drenched boulevard cruise",
+        "confident laid-back groove"
+      ],
+      "vocal_delivery": [
+        "smooth West Coast cadence",
+        "talkbox hook vocals"
+      ],
+      "drums": [
+        "laid-back crisp West Coast clap and kick"
+      ],
+      "bass": [
+        "deep rubbery Moog synth bassline"
+      ],
+      "instrumentation": [
+        "high-pitched portamento synth lead",
+        "funk electric guitar wah"
+      ],
+      "mix_texture": "warm analog studio mix",
+      "platform_hint": "Suno / Udio",
+      "exclude_styles": [
+        "industrial metal",
+        "hyperpop",
+        "drill"
+      ],
+      "quality_score": 96,
+      "tags": [
+        "g-funk",
+        "west coast",
+        "90s",
+        "talkbox",
+        "moog"
+      ],
+      "notes": "Classic California parliament-funk synthesis and high-sine whistle leads."
+    },
+    {
+      "style_id": "trap_atlanta_luxury",
+      "style_name": "Atlanta luxury trap",
+      "style_family": "trap",
+      "region": "Atlanta",
+      "era": "modern",
+      "tempo_min": 136,
+      "tempo_max": 152,
+      "energy": "luxury",
+      "mood": [
+        "penthouse victory atmosphere",
+        "high-roller nocturnal"
+      ],
+      "vocal_delivery": [
+        "melodic autotune hook",
+        "confident triplet verse"
+      ],
+      "drums": [
+        "crisp fast-roll hi-hats",
+        "tight clap"
+      ],
+      "bass": [
+        "deep tuned 808 sub bass"
+      ],
+      "instrumentation": [
+        "icy synth bells",
+        "lush ambient pad"
+      ],
+      "mix_texture": "polished club mix",
+      "platform_hint": "Suno / Udio",
+      "exclude_styles": [
+        "acoustic folk",
+        "country",
+        "raw punk"
+      ],
+      "quality_score": 95,
+      "tags": [
+        "atlanta",
+        "trap",
+        "luxury",
+        "autotune"
+      ],
+      "notes": "Wide stereo imaging with pristine sub-bass translation."
+    },
+    {
+      "style_id": "regional_detroit_bounce",
+      "style_name": "Detroit street rap",
+      "style_family": "regional_rap",
+      "region": "Detroit",
+      "era": "modern",
+      "tempo_min": 175,
+      "tempo_max": 195,
+      "energy": "aggressive",
+      "mood": [
+        "relentless street urgency",
+        "off-kilter dark humor"
+      ],
+      "vocal_delivery": [
+        "conversational punchline flow",
+        "Slightly behind-the-beat delivery"
+      ],
+      "drums": [
+        "fast snappy Detroit rimshot and tamborine bounce"
+      ],
+      "bass": [
+        "short punchy 808 synth bass"
+      ],
+      "instrumentation": [
+        "urgent minor staccato piano loop",
+        "tense pizzicato strings"
+      ],
+      "mix_texture": "dry upfront punchy mix",
+      "platform_hint": "Suno / Udio",
+      "exclude_styles": [
+        "slow ballad",
+        "tropical house",
+        "ambient drone"
+      ],
+      "quality_score": 95,
+      "tags": [
+        "detroit",
+        "piano",
+        "up-tempo",
+        "regional"
+      ],
+      "notes": "Fast-paced urgent piano loops with distinct synth-bass bounce."
+    },
+    {
+      "style_id": "conscious_jazz_rap",
+      "style_name": "conscious jazz rap",
+      "style_family": "conscious_rap",
+      "region": "Chicago",
+      "era": "2000s",
+      "tempo_min": 84,
+      "tempo_max": 94,
+      "energy": "emotional",
+      "mood": [
+        "introspective late-night coffeehouse",
+        "soulful warmth"
+      ],
+      "vocal_delivery": [
+        "poetic articulate rap flow",
+        "neo-soul background harmonies"
+      ],
+      "drums": [
+        "brushed live jazz snare and warm kick"
+      ],
+      "bass": [
+        "melodic fretless electric bass"
+      ],
+      "instrumentation": [
+        "muted Miles-style trumpet",
+        "warm Fender Rhodes chords"
+      ],
+      "mix_texture": "intimate warm tape mix",
+      "platform_hint": "Suno / Udio / MusicGen",
+      "exclude_styles": [
+        "violent horrorcore",
+        "club EDM",
+        "hyperpop"
+      ],
+      "quality_score": 96,
+      "tags": [
+        "jazz rap",
+        "conscious",
+        "chicago",
+        "rhodes",
+        "trumpet"
+      ],
+      "notes": "Live-instrument warmth with spacious headroom for lyricism."
+    },
+    {
+      "style_id": "emo_melodic_guitar",
+      "style_name": "emo trap ballad",
+      "style_family": "emo_rap",
+      "region": "East Coast",
+      "era": "2010s",
+      "tempo_min": 125,
+      "tempo_max": 145,
+      "energy": "emotional",
+      "mood": [
+        "heartbreak and late-night solitude",
+        "melancholic catharsis"
+      ],
+      "vocal_delivery": [
+        "layered melodic emo-rap vocals",
+        "strained emotional hook"
+      ],
+      "drums": [
+        "crisp trap hi-hats with rock snare layer"
+      ],
+      "bass": [
+        "warm saturated 808 bass"
+      ],
+      "instrumentation": [
+        "chorus-drenched clean electric guitar arpeggio"
+      ],
+      "mix_texture": "spacious atmospheric reverb mix",
+      "platform_hint": "Suno / Udio",
+      "exclude_styles": [
+        "upbeat party club",
+        "comedy novelty",
+        "funk brass"
+      ],
+      "quality_score": 94,
+      "tags": [
+        "emo rap",
+        "guitar",
+        "melodic",
+        "2010s"
+      ],
+      "notes": "Clean midwest-emo inspired guitar loop paired with modern 808 percussion."
+    },
+    {
+      "style_id": "drill_brooklyn_sample",
+      "style_name": "Brooklyn sample drill",
+      "style_family": "drill",
+      "region": "East Coast",
+      "era": "modern",
+      "tempo_min": 142,
+      "tempo_max": 148,
+      "energy": "aggressive",
+      "mood": [
+        "high-voltage borough energy",
+        "gritty street celebration"
+      ],
+      "vocal_delivery": [
+        "raspy energetic Brooklyn drill cadence"
+      ],
+      "drums": [
+        "stutter-step New York drill hi-hats and hard snare"
+      ],
+      "bass": [
+        "aggressive sliding 808 sub bass"
+      ],
+      "instrumentation": [
+        "pitched-up soulful vocal sample chop"
+      ],
+      "mix_texture": "loud club-ready master",
+      "platform_hint": "Suno / Udio",
+      "exclude_styles": [
+        "soft acoustic folk",
+        "country",
+        "ambient lullaby"
+      ],
+      "quality_score": 95,
+      "tags": [
+        "brooklyn drill",
+        "sample drill",
+        "new york",
+        "sliding 808"
+      ],
+      "notes": "Pitched R&B/pop vocal sample juxtaposed against aggressive drill percussion."
+    }
+  ]
+}
