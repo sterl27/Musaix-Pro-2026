@@ -4,6 +4,7 @@ import tempfile
 from pathlib import Path
 from typing import Any
 
+import audioread.exceptions
 import librosa
 import numpy as np
 from fastapi import FastAPI, File, HTTPException, UploadFile, status
@@ -73,7 +74,13 @@ async def analyze_audio(file: UploadFile = File(...)) -> AnalysisResponse:
 
         try:
             y, sr = librosa.load(tmp_path, sr=None, mono=True)
-        except (EOFError, OSError, RuntimeError, ValueError) as exc:
+        except (
+            EOFError,
+            OSError,
+            RuntimeError,
+            ValueError,
+            audioread.exceptions.DecodeError,
+        ) as exc:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Audio file could not be decoded",
