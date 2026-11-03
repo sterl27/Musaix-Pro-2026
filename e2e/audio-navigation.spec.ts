@@ -1,0 +1,41 @@
+import { test, expect } from '@playwright/test';
+function wav(seconds=8){const rate=16000;const data=Buffer.alloc(44+rate*seconds*2);data.write('RIFF');data.writeUInt32LE(data.length-8,4);data.write('WAVEfmt ',8);data.writeUInt32LE(16,16);data.writeUInt16LE(1,20);data.writeUInt16LE(1,22);data.writeUInt32LE(rate,24);data.writeUInt32LE(rate*2,28);data.writeUInt16LE(2,32);data.writeUInt16LE(16,34);data.write('data',36);data.writeUInt32LE(data.length-44,40);for(let i=0;i<rate*seconds;i++)data.writeInt16LE(Math.round(Math.sin(i*2*Math.PI*220/rate)*2500),44+i*2);return data;}
+test('one real player survives Studio and Canvas navigation',async({page})=>{
+ const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
+ await page.goto('/audio');await expect(page).toHaveTitle('Musaix Pro');await expect(page.getByRole('heading',{name:'Everything starts with a song.'})).toBeVisible();
+ await page.getByLabel('Choose audio file').setInputFiles({name:'Transport fixture.wav',mimeType:'audio/wav',buffer:wav(30)});
+ await expect(page.getByRole('button',{name:'Pause',exact:true})).toBeVisible();
+ await page.evaluate(()=>{const a=document.querySelector('audio')!;(window as unknown as {testAudio:HTMLAudioElement}).testAudio=a;});
+ await expect.poll(()=>page.locator('audio').evaluate((a:HTMLAudioElement)=>a.currentTime)).toBeGreaterThan(.1);
+ const before=await page.locator('audio').evaluate((a:HTMLAudioElement)=>a.currentTime);
+ await page.getByRole('navigation',{name:'Workspace'}).getByRole('link',{name:'Studio',exact:true}).click();
+ await expect(page.getByRole('heading',{name:'Musaix Pro'})).toBeVisible();
+ await page.getByRole('link',{name:'Canvas',exact:true}).click();
+ await expect(page.getByRole('heading',{name:'Canvas',exact:true})).toBeVisible();
+ expect(await page.evaluate(()=>document.querySelector('audio')===(window as unknown as {testAudio:HTMLAudioElement}).testAudio)).toBe(true);
+ await expect(page.locator('audio')).toHaveCount(1);
+ await expect.poll(()=>page.locator('audio').evaluate((a:HTMLAudioElement)=>a.currentTime)).toBeGreaterThan(before);
+ await page.getByRole('button',{name:'Pause',exact:true}).click();await expect(page.getByRole('button',{name:'Play',exact:true})).toBeVisible();
+ await page.getByRole('slider',{name:'Seek',exact:true}).fill('12');await expect.poll(()=>page.locator('audio').evaluate((a:HTMLAudioElement)=>a.currentTime)).toBeCloseTo(12,0);
+ await page.getByRole('button',{name:'Mute',exact:true}).click();expect(await page.locator('audio').evaluate((a:HTMLAudioElement)=>a.muted)).toBe(true);
+ await page.getByRole('button',{name:'Unmute',exact:true}).click();await page.getByRole('button',{name:'Play',exact:true}).click();await expect(page.getByRole('button',{name:'Pause',exact:true})).toBeVisible();
+ expect(errors).toEqual([]);
+});
+test('mobile workspace is readable, rejects invalid files, and manages queue',async({page})=>{
+ await page.setViewportSize({width:390,height:844});await page.goto('/audio');
+ await expect(page.getByRole('button',{name:'Play',exact:true})).toBeDisabled();
+ await page.getByLabel('Choose audio file').setInputFiles({name:'fake.wav',mimeType:'audio/wav',buffer:Buffer.from('not an audio file')});
+ await expect(page.locator('.audio-message[role=alert]')).toContainText('valid audio header');
+ await page.getByLabel('Choose audio file').setInputFiles({name:'First.wav',mimeType:'audio/wav',buffer:wav(30)});
+ await expect(page.getByRole('button',{name:'Pause',exact:true})).toBeVisible();
+ await page.getByLabel('Choose audio file').setInputFiles({name:'Second.wav',mimeType:'audio/wav',buffer:wav(30)});
+ await expect(page.getByRole('button',{name:'Pause',exact:true})).toBeVisible();
+ await page.getByRole('button',{name:'Queue',exact:true}).click();await expect(page.getByRole('button',{name:'Remove First',exact:true})).toBeVisible();
+ await page.getByRole('button',{name:'Previous track',exact:true}).click();await expect(page.locator('.audio-track-label strong')).toHaveText('First');
+ await page.getByRole('button',{name:'Next track',exact:true}).click();await expect(page.locator('.audio-track-label strong')).toHaveText('Second');
+ await page.getByRole('button',{name:'Remove Second',exact:true}).click();await expect(page.getByRole('button',{name:'Play',exact:true})).toBeDisabled();
+ await page.getByRole('button',{name:'Close queue',exact:true}).click();
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);
+ await page.screenshot({path:'/tmp/musaix-mobile.png',fullPage:true});
+});
+test('desktop workspace renders without a framework error overlay',async({page})=>{await page.goto('/audio');await expect(page.getByRole('heading',{name:'Bring your sound.'})).toBeVisible();await expect(page.locator('nextjs-portal')).toHaveCount(0);await page.screenshot({path:'/tmp/musaix-desktop.png',fullPage:true});});

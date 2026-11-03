@@ -17,6 +17,7 @@ import {
   Terminal,
   Wifi,
 } from 'lucide-react';
+import { TwoTrackStudio } from '@/components/two-track/two-track-studio';
 
 const patches = [
   ['Moody Noir', 'Granular black tape texture', '✦✦✦✦☆'],
@@ -112,7 +113,7 @@ export default function StudioPage() {
         <aside className="flex w-24 flex-col items-center justify-between border-r border-[#3d3128] bg-[#11100f]/88 py-7">
           <div className="flex flex-col gap-10">
             {navItems.map(([name, Icon]) => (
-              <Link key={name as string} href={name === 'Library' ? '/canvas' : '/studio'} className="group flex flex-col items-center gap-2 text-[#c9a98a] hover:text-[#ffbd78]">
+              <Link key={name as string} href={name === 'Library' ? '/canvas' : name === 'Transport' ? '/studio#two-track' : '/studio'} className="group flex flex-col items-center gap-2 text-[#c9a98a] hover:text-[#ffbd78]">
                 <Icon className="h-5 w-5" />
                 <span className="text-[10px] font-black uppercase tracking-wider">{name as string}</span>
               </Link>
@@ -188,7 +189,7 @@ export default function StudioPage() {
                 <span>Search...</span>
               </div>
               <div className="mt-4 divide-y divide-[#3c332b] border-y border-[#3c332b]">
-                {patches.map(([name, desc, rating], index) => (
+                {patches.map(([name, desc, rating]) => (
                   <button key={name} className="grid w-full grid-cols-[52px_1fr_auto] items-center gap-4 py-3 text-left hover:bg-[#241f1a]">
                     <span className="grid h-12 w-12 place-items-center rounded-md border border-[#322b25] bg-[radial-gradient(circle_at_35%_35%,rgba(158,237,129,0.55),rgba(31,35,30,0.9))] text-[#e9d7a8]">
                       <Sparkles className="h-5 w-5" />
@@ -216,6 +217,10 @@ export default function StudioPage() {
                 </div>
               </div>
             </section>
+          </div>
+
+          <div className="px-5 pb-5">
+            <TwoTrackStudio />
           </div>
 
           <footer className="flex h-8 items-center justify-between border-t border-[#3d3128] px-7 text-[10px] uppercase tracking-widest text-[#6f5f51]">
