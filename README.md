@@ -146,3 +146,16 @@ Configure the existing `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBL
 Use Node.js 22+ and `npm ci`. Verify with `npm run test:run`, `npm run typecheck`, `npm run lint`, and `npm run build`. For real media/navigation tests: `npx playwright install chromium`, `npm run build`, then `npm run test:e2e`. Tests generate an in-memory WAV; no private music is committed.
 
 The Next application lives in `src/`; legacy standalone demo files at the root are preserved but excluded from its typecheck. Metering, MIR reports, stems and agent interpretation remain later milestones. See `docs/audio-runtime-verification.md` for measured checks and limits.
+
+## 2-Track Recorder (Studio)
+
+`/studio#two-track` (Workspace nav → **Transport**) mounts `TwoTrackStudio` below the existing studio panels, which are unchanged. It runs fully in the browser on the Web Audio API.
+
+- **Track 1 – Beat:** a 16-step drum sequencer (kick/snare/hat/…, swing, MUSAIX presets from `musaix-presets.json`), or an **MP3/WAV/M4A/OGG beat** with automatic BPM and downbeat detection, ×2/÷2, tap tempo, a draggable downbeat/loop-start on the waveform, and a loop-region or full-song choice.
+- **Track 2 – Rec:** the mic (with monitor and latency compensation) records on the beat's downbeat after a one-bar count-in when stopped. It records the loop length or the whole song.
+- **Mixer:** beat/rec/master volume and mutes, plus master and mic level meters.
+- **Export:** mix to 16-bit WAV (with repeats), the raw take as WAV, the pattern as a Standard MIDI file, and the MUSAIX Ableton Bridge JSON (GM drum notes on channel 10).
+- **Studio library:** uses the existing Supabase client, `musaix_tracks` and the private `musaix-audio` bucket. No new tables or buckets. Rows are told apart by `metadata.kind` (`two_track_take` / `two_track_beat`). Takes store the bars, pattern, swing, preset and linked beat id in `metadata`. Cloud save is behind a feature check: with no `NEXT_PUBLIC_SUPABASE_*` env it shows "not configured", and signed-out users are sent to `/audio` to sign in. Saved items can also be played in the global player.
+- **Shortcuts:** Space plays/stops and R records. Both are ignored while typing or when a control has focus.
+
+Code: `src/lib/two-track/` (engine, tempo analysis, drums, WAV/MIDI writers, presets, repository) and `src/components/two-track/`. Tests: `src/lib/two-track/__tests__`, `src/components/two-track/__tests__`, and `e2e/two-track-studio.spec.ts`. The e2e uses Chromium's fake mic and the synthetic `e2e/fixtures/beat100.mp3`, a 100 BPM loop with its downbeat at 0.5 s.
