@@ -1,3 +1,11 @@
+-- HISTORICAL REFERENCE ONLY — DO NOT EXECUTE AGAINST LIVE MUSAIX SUPABASE.
+-- This legacy design targets public.tracks (UUID), public.analysis_jobs, and public.analysis_results.
+-- On project xexzplnyzblflucfvbwt, public.tracks is an unrelated INTEGER-keyed table.
+-- Production audio data uses public.musaix_tracks and public.musaix_analysis_jobs instead.
+-- Those tables already have RLS, ownership policies, constraints, and timestamps.
+-- See https://github.com/sterl27/Musaix-Pro-2026/issues/11 for reconciliation details.
+-- This file is retained solely to document the abandoned design; it is not a deployment migration.
+
 -- Musaix Pro audio-analysis schema extension
 -- Apply after the base Musaix Canvas schema.
 
