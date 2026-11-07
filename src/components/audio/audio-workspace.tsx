@@ -63,7 +63,7 @@ export function AudioWorkspace() {
   async function signOut(){setError('');try{const {error}=await clientRef.current!.auth.signOut();if(error)throw error;setMessage('Signed out.');}catch(e){setError(e instanceof Error?e.message:'Sign out failed.');}}
   function drop(event:DragEvent){event.preventDefault();setDragging(false);if(event.dataTransfer.files.length!==1){setError('Open one song at a time.');return;}void openFile(event.dataTransfer.files[0]);}
   return <main className="audio-workspace">
-    <nav className="audio-nav" aria-label="Workspace"><Link href="/" className="audio-brand">MUSAIX <b>PRO</b></Link><div className="audio-links"><Link href="/studio">Studio</Link><Link href="/canvas">Canvas</Link><Link href="/audio" aria-current="page">Audio</Link></div></nav>
+    <nav className="audio-nav" aria-label="Workspace"><Link href="/" className="audio-brand">MUSAIX <b>PRO</b></Link><div className="audio-links"><Link href="/studio">Studio</Link><Link href="/canvas">Canvas</Link><Link href="/audio" aria-current="page">Audio</Link><Link href="/research">Research</Link></div></nav>
     <header className="audio-hero"><span className="audio-eyebrow">Your sound. An entire universe.</span><h1>Everything starts<br/>with a song.</h1><p>Drop in a track. Keep listening as you move through your workspace. Save it when you’re ready.</p></header>
     <section className={`audio-drop ${dragging?'dragging':''}`} aria-label="Open audio" onDragOver={event=>{event.preventDefault();setDragging(true);}} onDragLeave={()=>setDragging(false)} onDrop={drop}>
       <Headphones size={30} strokeWidth={1.3}/><h2>{file?file.name:'Bring your sound.'}</h2><p>Drag a song here, or choose a file.<br/>WAV or MP3 · Up to 100 MB</p>
