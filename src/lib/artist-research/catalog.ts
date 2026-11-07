@@ -1,6 +1,7 @@
 import type { ArtistCandidate, ArtistCatalog, CatalogLookup, CatalogSearch, PublicIdentity, PublicSource } from './types';
 import { CATALOG_USER_AGENT, CatalogNotFoundError, CatalogRequestError, fetchCatalogJsonWithRetry, HostPacer, type CatalogFetchOptions } from './http';
 import { capExcerpt, plain } from './text';
+import { filterCandidates } from './match';
 import { catalogIdFor, isCitationUrl, parseArtistLink, parseCatalogId } from './url-policy';
 
 const CANDIDATE_LIMIT = 8;
@@ -13,6 +14,7 @@ export type MbHit = {
   area: string;
   country: string;
   tags: string[];
+  aliases: string[];
   wikidata: string;
 };
 
@@ -32,6 +34,7 @@ export function mergeCandidates(mb: MbHit[], wiki: WikiHit[], limit = CANDIDATE_
       area: hit.area || countryName(hit.country),
       blurb: hit.disambiguation || 'MusicBrainz artist record. No disambiguation text was provided.',
       urls,
+      aliases: hit.aliases,
     });
   }
   for (const page of wiki) {
@@ -90,6 +93,7 @@ export function musicBrainzExcerpt(hit: MbHit): string {
   if (hit.disambiguation) parts.push(`described as ${hit.disambiguation}`);
   if (hit.area) parts.push(`associated with ${hit.area}`);
   if (hit.country) parts.push(`country code ${hit.country}`);
+  if (hit.aliases.length) parts.push(`also listed as ${hit.aliases.slice(0, 4).join(', ')}`);
   if (hit.tags.length) parts.push(`catalog tags: ${hit.tags.join(', ')}`);
   return capExcerpt(`${parts.join('. ')}.`);
 }
@@ -121,7 +125,8 @@ export class LiveArtistCatalog implements ArtistCatalog {
     const mbUrl = new URL('https://musicbrainz.org/ws/2/artist/');
     mbUrl.searchParams.set('fmt', 'json');
     mbUrl.searchParams.set('limit', '5');
-    mbUrl.searchParams.set('query', `"${name.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`);
+    const escaped = name.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+    mbUrl.searchParams.set('query', `artist:"${escaped}" OR alias:"${escaped}"`);
     const wikiUrl = new URL('https://en.wikipedia.org/w/api.php');
     wikiUrl.searchParams.set('action', 'opensearch');
     wikiUrl.searchParams.set('format', 'json');
@@ -135,7 +140,7 @@ export class LiveArtistCatalog implements ArtistCatalog {
     const mb = parseMbSearch(mbPayload);
     const wiki = parseWikiSearch(wikiPayload);
     if (!mb || !wiki) throw new CatalogRequestError('A catalog returned a response that could not be read.', !mb ? 'musicbrainz' : 'english-wikipedia');
-    return mergeCandidates(mb, wiki);
+    return filterCandidates(name, mergeCandidates(mb, wiki));
   }
 
   async lookup(id: string, signal: AbortSignal): Promise<CatalogLookup> {
@@ -322,8 +327,20 @@ function parseMbArtist(artist: unknown): MbHit | null {
     area: plain(record.area?.name, 80),
     country,
     tags: tagsFrom(record.tags),
+    aliases: aliasesFrom((record as { aliases?: unknown }).aliases),
     wikidata: wikidataRelation(record.relations),
   };
+}
+
+function aliasesFrom(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  const names: string[] = [];
+  for (const alias of value) {
+    const name = plain(alias && typeof alias === 'object' ? (alias as { name?: unknown }).name : '', 120);
+    if (name) names.push(name);
+    if (names.length === 8) break;
+  }
+  return names;
 }
 
 function tagsFrom(value: unknown): string[] {
@@ -384,6 +401,7 @@ function identityFrom(hit: MbHit, urls: PublicIdentity['urls']): PublicIdentity 
     kind: hit.type || 'artist',
     area: hit.area || countryName(hit.country),
     urls: urls.filter((link) => isCitationUrl(link.href)),
+    aliases: hit.aliases,
   };
 }
 

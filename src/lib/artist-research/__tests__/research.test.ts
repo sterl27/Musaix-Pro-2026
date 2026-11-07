@@ -91,6 +91,7 @@ describe('artist research input limits', () => {
       area: '',
       country: '',
       tags: [],
+      aliases: [],
       wikidata: '',
     }));
     const merged = mergeCandidates(hits, []);

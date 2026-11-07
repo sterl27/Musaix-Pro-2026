@@ -2,46 +2,64 @@
 
 import Link from 'next/link';
 import { useRef, useState, type FormEvent } from 'react';
-import { reportIsSafeToRender } from '@/lib/artist-research/report-schema';
-import type { ArtistCandidate, ProviderReport, PublicIdentity, PublicSource, ResearchResult, SourceKind } from '@/lib/artist-research/types';
-import { ReportView } from './report-view';
+import type { ArtistCandidate, NameMatch, ProviderReport, PublicIdentity, PublicSource, ResearchResult } from '@/lib/artist-research/types';
+import { ResearchDesk, SearchLinks } from './research-desk';
 import './research.css';
 
-type View = ResearchResult | { status: 'idle' } | { status: 'loading'; message: string };
+type Phase =
+  | { status: 'idle' }
+  | { status: 'loading'; message: string }
+  | { status: 'invalid_input' | 'unknown' | 'ambiguous_page' | 'rate_limited' | 'provider_unavailable' | 'cancelled' | 'report_hidden'; message: string }
+  | { status: 'disambiguation'; query: string; candidates: ArtistCandidate[]; truncated: boolean; message: string }
+  | { status: 'workspace'; identity: PublicIdentity; sources: PublicSource[]; candidates: ArtistCandidate[]; query: string };
 
-const KIND_LABEL: Record<SourceKind, string> = {
-  catalog_record: 'Catalog record',
-  encyclopedia_summary: 'Encyclopedia summary',
-  interview: 'Interview',
-  review: 'Review',
-  criticism: 'Criticism',
-  artist_statement: 'Artist statement',
+const TIER: Record<NameMatch, string> = {
+  exact: 'Exact name',
+  phrase: 'Name contains your words',
+  alias: 'Alias',
+  mention: 'Mentioned under another name',
 };
 
 export function ResearchWorkspace({ providerReport }: { providerReport: ProviderReport }) {
   const [query, setQuery] = useState('');
-  const [view, setView] = useState<View>({ status: 'idle' });
+  const [phase, setPhase] = useState<Phase>({ status: 'idle' });
+  const [pendingLookup, setPendingLookup] = useState('');
+  const [deskDirty, setDeskDirty] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
+  const lastRef = useRef<{ action: 'resolve'; query: string } | { action: 'inspect'; id: string } | null>(null);
+  const choicesRef = useRef<ArtistCandidate[]>([]);
 
-  function reset() {
-    abortRef.current?.abort();
-    setView({ status: 'idle' });
+  function resetDesk() {
+    setDeskDirty(false);
+    setPendingLookup('');
   }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    await run({ action: 'resolve', query: query.trim() }, 'Looking up public catalog records.');
+    const next = query.trim();
+    if (deskDirty) {
+      setPendingLookup(next);
+      return;
+    }
+    await run({ action: 'resolve', query: next }, 'Checking MusicBrainz and English Wikipedia.');
   }
 
   async function choose(id: string) {
-    await run({ action: 'inspect', id }, 'Opening the selected catalog record.');
+    resetDesk();
+    await run({ action: 'inspect', id }, 'Opening the catalog record.');
+  }
+
+  async function retry() {
+    if (lastRef.current) await run(lastRef.current, 'Checking the catalog again.');
   }
 
   async function run(body: { action: 'resolve'; query: string } | { action: 'inspect'; id: string }, message: string) {
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
-    setView({ status: 'loading', message });
+    lastRef.current = body;
+    if (body.action === 'resolve') choicesRef.current = [];
+    setPhase({ status: 'loading', message });
     try {
       const response = await fetch('/api/artist-research', {
         method: 'POST',
@@ -52,14 +70,12 @@ export function ResearchWorkspace({ providerReport }: { providerReport: Provider
       const payload = (await response.json().catch(() => null)) as ResearchResult | null;
       if (controller.signal.aborted) return;
       if (!payload || typeof payload !== 'object' || !('status' in payload)) {
-        setView({ ok: false, status: 'provider_unavailable', provider: 'app', message: 'The research service returned an unreadable response. No report was created.' });
+        setPhase({ status: 'provider_unavailable', message: 'The research service returned an unreadable response. No brief was invented.' });
         return;
       }
-      setView(acceptResult(payload));
+      setPhase(toPhase(payload, choicesRef));
     } catch {
-      if (!controller.signal.aborted) {
-        setView({ ok: false, status: 'provider_unavailable', provider: 'app', message: 'The research service could not be reached. No report was created.' });
-      }
+      if (!controller.signal.aborted) setPhase({ status: 'provider_unavailable', message: 'The research service could not be reached. No brief was invented.' });
     }
   }
 
@@ -79,107 +95,126 @@ export function ResearchWorkspace({ providerReport }: { providerReport: Provider
         </nav>
       </header>
       <p className="research-kicker">Public artist research</p>
-      <h1>Look up an artist. Do not invent the craft.</h1>
-      <p className="research-lead">
-        Enter a name or a MusicBrainz, English Wikipedia, or Wikidata link. Ambiguous names stay unresolved until you choose a record. Lyric-site pages are not fetched.
-      </p>
-      <ProviderPanel report={providerReport} />
+      <h1>Research an artist.</h1>
+      <p className="research-lead">Look up a public catalog record, keep your own notes, and count a short passage you are allowed to study. This page does not write an analysis.</p>
       <form className="research-form" onSubmit={onSubmit}>
         <label htmlFor="artist-query">Artist name or catalog link</label>
-        <input
-          id="artist-query"
-          name="artist"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          autoComplete="off"
-          required
-          maxLength={160}
-          placeholder="Artist name or https://musicbrainz.org/artist/…"
-        />
+        <input id="artist-query" name="artist" value={query} onChange={(event) => setQuery(event.target.value)} autoComplete="off" required maxLength={160} placeholder="Artist name or https://musicbrainz.org/artist/…" />
         <div className="research-actions">
-          <button className="research-primary" type="submit" disabled={view.status === 'loading'}>
-            Look up artist
+          <button className="research-primary" type="submit" disabled={phase.status === 'loading'}>
+            {phase.status === 'loading' ? 'Looking up…' : 'Look up artist'}
           </button>
-          {view.status !== 'idle' ? (
-            <button className="research-secondary" type="button" onClick={reset}>
+          {phase.status !== 'idle' ? (
+            <button
+              className="research-secondary"
+              type="button"
+              onClick={() => {
+                abortRef.current?.abort();
+                resetDesk();
+                setPhase({ status: 'idle' });
+              }}
+            >
               Clear
             </button>
           ) : null}
         </div>
-        <p className="research-note">Lookup reads public catalog records. It does not call a model and it does not turn a biography into a lyric analysis.</p>
+        {pendingLookup ? (
+          <div className="research-alert" role="alert">
+            <p>Start a new lookup? Notes and the pasted passage in this tab will be cleared.</p>
+            <div className="research-actions">
+              <button
+                className="research-primary"
+                type="button"
+                onClick={() => {
+                  resetDesk();
+                  void run({ action: 'resolve', query: pendingLookup }, 'Checking MusicBrainz and English Wikipedia.');
+                }}
+              >
+                Start lookup
+              </button>
+              <button className="research-secondary" type="button" onClick={() => setPendingLookup('')}>
+                Keep this record
+              </button>
+            </div>
+          </div>
+        ) : null}
       </form>
-      <section aria-live="polite" aria-busy={view.status === 'loading'}>
-        {view.status === 'loading' ? <p className="research-result">{view.message}</p> : null}
-        {view.status === 'invalid_input' || view.status === 'unknown' || view.status === 'ambiguous_page' || view.status === 'rate_limited' ? (
-          <p className="research-result research-alert" role="alert" data-state={view.status}>
-            {view.message}
+      <section aria-live="polite" aria-busy={phase.status === 'loading'}>
+        {phase.status === 'idle' ? (
+          <div className="research-result" data-state="idle">
+            <h2>Start a brief</h2>
+            <ol className="research-steps">
+              <li>Look up a name or a MusicBrainz, English Wikipedia, or Wikidata link.</li>
+              <li>Choose the record when more than one name fits.</li>
+              <li>Add notes or paste a short passage, then download the brief.</li>
+            </ol>
+          </div>
+        ) : null}
+        {phase.status === 'loading' ? (
+          <p className="research-result" data-state="loading">
+            {phase.message}
           </p>
         ) : null}
-        {view.status === 'provider_unavailable' ? (
-          <p className="research-result research-alert" role="alert" data-state="provider_unavailable">
-            {view.message}
-          </p>
-        ) : null}
-        {view.status === 'cancelled' ? <p className="research-result">{view.message}</p> : null}
-        {view.status === 'disambiguation' ? <Disambiguation view={view} onChoose={choose} /> : null}
-        {view.status === 'insufficient_sources' || view.status === 'synthesis_unavailable' || view.status === 'billing_confirmation_required' ? (
-          <IdentityResult view={view} />
-        ) : null}
-        {view.status === 'report_rejected' ? (
-          <div className="research-result research-alert" role="alert" data-state="report_rejected">
-            <h2>Draft discarded</h2>
-            <p>{view.message}</p>
-            {view.errors?.length ? (
-              <ul>
-                {view.errors.map((error) => (
-                  <li key={error}>{error}</li>
-                ))}
-              </ul>
+        {phase.status === 'invalid_input' || phase.status === 'ambiguous_page' || phase.status === 'rate_limited' || phase.status === 'cancelled' || phase.status === 'report_hidden' ? (
+          <div className="research-result research-alert" role="alert" data-state={phase.status}>
+            <p>{phase.message}</p>
+            {phase.status !== 'report_hidden' && lastRef.current ? (
+              <button className="research-secondary" type="button" onClick={() => void retry()}>
+                Try again
+              </button>
             ) : null}
           </div>
         ) : null}
-        {view.status === 'report' ? <ReportView report={view.report} /> : null}
+        {phase.status === 'provider_unavailable' ? (
+          <div className="research-result research-alert" role="alert" data-state="provider_unavailable">
+            <h2>The catalog did not respond</h2>
+            <p>{phase.message}</p>
+            <button className="research-secondary" type="button" onClick={() => void retry()}>
+              Try the catalog again
+            </button>
+          </div>
+        ) : null}
+        {phase.status === 'unknown' ? (
+          <div className="research-result" role="alert" data-state="unknown">
+            <h2>No exact catalog name</h2>
+            <p>{phase.message}</p>
+            <SearchLinks name={query} />
+          </div>
+        ) : null}
+        {phase.status === 'disambiguation' ? (
+          <div className="research-result" data-state="disambiguation">
+            <h2>Which record did you mean?</h2>
+            <p>{phase.message}</p>
+            {phase.truncated ? <p>Further catalog matches were left off this list.</p> : null}
+            <ul className="research-candidates">
+              {phase.candidates.map((candidate) => (
+                <CandidateCard key={candidate.id} candidate={candidate} onChoose={choose} />
+              ))}
+            </ul>
+            <SearchLinks name={phase.query} />
+          </div>
+        ) : null}
+        {phase.status === 'workspace' ? (
+          <ResearchDesk
+            identity={phase.identity}
+            sources={phase.sources}
+            onDirty={setDeskDirty}
+            onLeave={() => {
+              resetDesk();
+              if (phase.candidates.length > 1) {
+                setPhase({ status: 'disambiguation', query: phase.query, candidates: phase.candidates, truncated: false, message: 'Choose another catalog record. Notes from the previous record were cleared.' });
+              } else setPhase({ status: 'idle' });
+            }}
+          />
+        ) : null}
       </section>
-    </main>
-  );
-}
-
-function ProviderPanel({ report }: { report: ProviderReport }) {
-  return (
-    <section className="research-panel" aria-labelledby="provider-status">
-      <h2 id="provider-status">Provider status</h2>
-      <p className="research-status" data-synthesis={report.synthesis.enabled ? 'on' : 'off'}>
-        {report.synthesis.summary}
-      </p>
       <details className="research-details">
-        <summary>Why model generation stays off</summary>
-        <p>{report.catalog.note}</p>
-        <p>{report.privateArchives.note}</p>
-        {report.synthesis.alternatives.map((item) => (
-          <article key={item.id} className="research-alternative">
-            <h3>{item.id}</h3>
-            <p>{item.decision}</p>
-            <p className="research-meta">{item.repoEvidence}</p>
-            <p className="research-meta">Billing if called: {item.billing === 'would_bill_if_called' ? 'possible provider charge' : 'not a model account'}. Selectable here: no.</p>
-          </article>
-        ))}
+        <summary>Why generated analysis is off</summary>
+        <p>{providerReport.synthesis.summary}</p>
+        <p>{providerReport.catalog.note}</p>
+        <p>{providerReport.privateArchives.note}</p>
       </details>
-    </section>
-  );
-}
-
-function Disambiguation({ view, onChoose }: { view: Extract<ResearchResult, { status: 'disambiguation' }>; onChoose: (id: string) => void }) {
-  return (
-    <div className="research-result" data-state="disambiguation">
-      <h2>Which artist did you mean?</h2>
-      <p>{view.message}</p>
-      {view.truncated ? <p>Additional catalog matches were left off this page.</p> : null}
-      <ul className="research-candidates">
-        {view.candidates.map((candidate) => (
-          <CandidateCard key={candidate.id} candidate={candidate} onChoose={onChoose} />
-        ))}
-      </ul>
-    </div>
+    </main>
   );
 }
 
@@ -187,87 +222,28 @@ function CandidateCard({ candidate, onChoose }: { candidate: ArtistCandidate; on
   const label = candidate.disambiguation ? `${candidate.name}, ${candidate.disambiguation}` : candidate.name;
   return (
     <li className="research-candidate">
+      {candidate.match ? <span className="research-tier">{TIER[candidate.match]}</span> : null}
       <h3>{candidate.name}</h3>
-      <p>{candidate.disambiguation || 'No catalog disambiguation was returned.'}</p>
+      <p>{candidate.disambiguation || 'No short catalog description was returned.'}</p>
       <p className="research-meta">{[candidate.kind, candidate.area].filter(Boolean).join(' · ') || 'Catalog record'}</p>
-      <p>{candidate.blurb}</p>
-      <ul className="research-links">
-        {candidate.urls.map((url) => (
-          <li key={url.href}>
-            <a href={url.href} target="_blank" rel="noreferrer">
-              {url.label}
-            </a>
-          </li>
-        ))}
-      </ul>
+      {candidate.match && candidate.match !== 'exact' ? <p>{candidate.blurb}</p> : null}
       <button className="research-secondary" type="button" onClick={() => onChoose(candidate.id)}>
-        Use {label}
+        Choose {label}
       </button>
     </li>
   );
 }
 
-function IdentityResult({ view }: { view: Extract<ResearchResult, { status: 'insufficient_sources' | 'synthesis_unavailable' | 'billing_confirmation_required' }> }) {
-  return (
-    <div className="research-result" data-state={view.status}>
-      <h2>{view.identity.name}</h2>
-      <p className="research-banner">Craft report not generated. No model was called.</p>
-      <p>{view.message}</p>
-      <IdentityFacts identity={view.identity} />
-      <SourceCards sources={view.sources} />
-    </div>
-  );
-}
-
-function IdentityFacts({ identity }: { identity: PublicIdentity }) {
-  return (
-    <>
-      <p>{identity.disambiguation || 'No catalog disambiguation was returned.'}</p>
-      <p className="research-meta">{[identity.kind, identity.area].filter(Boolean).join(' · ')}</p>
-      <ul className="research-links">
-        {identity.urls.map((url) => (
-          <li key={url.href}>
-            <a href={url.href} target="_blank" rel="noreferrer">
-              {url.label}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </>
-  );
-}
-
-function SourceCards({ sources }: { sources: PublicSource[] }) {
-  if (!sources.length) return <p>No source text was returned.</p>;
-  return (
-    <ul className="research-sources">
-      {sources.map((source) => (
-        <li key={source.id} className="research-source">
-          <h3>{source.title}</h3>
-          <p className="research-meta">
-            {KIND_LABEL[source.kind]} · {source.publisher}
-          </p>
-          <p className="research-untrusted">The text below is untrusted source material. It is not a measurement and not a craft conclusion.</p>
-          <blockquote cite={source.url}>
-            <p>{source.excerpt}</p>
-          </blockquote>
-          <a href={source.url} target="_blank" rel="noreferrer">
-            Open source
-          </a>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-function acceptResult(result: ResearchResult): ResearchResult {
-  if (result.status === 'report' && !reportIsSafeToRender(result.report)) {
-    return {
-      ok: false,
-      status: 'report_rejected',
-      message: 'The response failed the display check and was not shown.',
-      errors: ['The report was missing its labels or included a forbidden measurement field.'],
-    };
+function toPhase(result: ResearchResult, choices: { current: ArtistCandidate[] }): Phase {
+  if (result.status === 'disambiguation') {
+    choices.current = result.candidates;
+    return { status: 'disambiguation', query: result.query, candidates: result.candidates, truncated: result.truncated, message: result.message };
   }
-  return result;
+  if (result.status === 'insufficient_sources' || result.status === 'synthesis_unavailable' || result.status === 'billing_confirmation_required') {
+    return { status: 'workspace', identity: result.identity, sources: result.sources, candidates: choices.current, query: result.identity.name };
+  }
+  if (result.status === 'report' || result.status === 'report_rejected') {
+    return { status: 'report_hidden', message: 'A generated analysis was not shown. This page keeps catalog text, your notes, and passage counts only.' };
+  }
+  return { status: result.status, message: result.message };
 }

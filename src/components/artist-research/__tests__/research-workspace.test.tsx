@@ -2,99 +2,104 @@ import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { getResearchProviderReport } from '@/lib/artist-research/providers';
-import { buildFixtureReport } from '@/lib/artist-research/__tests__/fixture-report';
 import { ResearchWorkspace } from '../research-workspace';
 
 afterEach(() => {
   cleanup();
   vi.unstubAllGlobals();
+  vi.restoreAllMocks();
 });
 
+const identity = {
+  id: 'mb:aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+  name: 'Young Solo',
+  disambiguation: 'Separate listing',
+  kind: 'person',
+  area: '',
+  urls: [{ label: 'MusicBrainz', href: 'https://musicbrainz.org/artist/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa' }],
+};
+
 describe('artist research workspace', () => {
-  it('shows the blocked provider state and no canned report', () => {
+  it('starts as a working brief instead of a generation dead end', () => {
     render(<ResearchWorkspace providerReport={getResearchProviderReport({})} />);
-    expect(screen.getByRole('heading', { name: 'Look up an artist. Do not invent the craft.' })).toBeInTheDocument();
-    expect(screen.getByText(/Craft synthesis is off/)).toBeInTheDocument();
-    expect(screen.getByText(/does not call a model/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Research an artist.' })).toBeInTheDocument();
+    expect(screen.getByText(/does not write an analysis/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Start a brief' })).toBeInTheDocument();
     expect(screen.queryByText(/Fixture report/)).not.toBeInTheDocument();
     expect(screen.queryByText(/Young Dolph/)).not.toBeInTheDocument();
   });
 
-  it('asks which artist was meant and does not collapse similar names', async () => {
-    const fetchMock = vi.fn().mockResolvedValueOnce(json({
-      ok: false,
-      status: 'disambiguation',
-      query: 'young solo',
-      truncated: false,
-      message: 'More than one catalog record could fit that name. Similar names stay separate until you choose one.',
-      candidates: [
-        { id: 'mb:aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', name: 'Young Solo', disambiguation: 'Separate listing', kind: 'person', area: '', blurb: 'Separate listing', urls: [] },
-        { id: 'mb:bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', name: 'Young Dolph', disambiguation: 'Memphis rapper', kind: 'person', area: 'Memphis', blurb: 'Memphis rapper', urls: [] },
-      ],
-    }));
+  it('keeps similar names separate and opens a desk instead of a model report', async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(json({
+        ok: false,
+        status: 'disambiguation',
+        query: 'young solo',
+        truncated: false,
+        message: 'More than one catalog record could fit. Exact names stay separate from looser mentions until you choose.',
+        candidates: [
+          { id: identity.id, name: 'Young Solo', disambiguation: 'Separate listing', kind: 'person', area: '', blurb: 'Separate listing', match: 'exact', urls: [] },
+          { id: 'mb:bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', name: 'Young Dolph', disambiguation: 'Memphis rapper', kind: 'person', area: 'Memphis', blurb: 'Memphis rapper', match: 'mention', urls: [] },
+        ],
+      }))
+      .mockResolvedValueOnce(json({
+        ok: false,
+        status: 'insufficient_sources',
+        message: 'Catalog only.',
+        identity,
+        sources: [{
+          id: identity.id,
+          title: 'Young Solo on MusicBrainz',
+          publisher: 'MusicBrainz',
+          url: identity.urls[0].href,
+          retrievedAt: '2026-11-07T18:00:00.000Z',
+          kind: 'catalog_record',
+          excerpt: 'Young Solo is a MusicBrainz person record.',
+        }],
+        synthesis: getResearchProviderReport({}),
+      }));
     vi.stubGlobal('fetch', fetchMock);
     const user = userEvent.setup();
     render(<ResearchWorkspace providerReport={getResearchProviderReport({})} />);
     await user.type(screen.getByLabelText('Artist name or catalog link'), 'young solo');
     await user.click(screen.getByRole('button', { name: 'Look up artist' }));
-    expect(await screen.findByRole('heading', { name: 'Which artist did you mean?' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Use Young Solo, Separate listing' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Use Young Dolph, Memphis rapper' })).toBeInTheDocument();
-    fetchMock.mockResolvedValueOnce(json({
-      ok: false,
-      status: 'insufficient_sources',
-      message: 'These catalog records identify a public artist page. They do not document lyric vocabulary.',
-      identity: { id: 'mb:aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', name: 'Young Solo', disambiguation: 'Separate listing', kind: 'person', area: '', urls: [] },
-      sources: [],
-      synthesis: getResearchProviderReport({}),
-    }));
-    await user.click(screen.getByRole('button', { name: 'Use Young Solo, Separate listing' }));
-    expect(await screen.findByText(/Craft report not generated/)).toBeInTheDocument();
-    const inspect = JSON.parse(fetchMock.mock.calls[1][1].body);
-    expect(inspect).toEqual({ action: 'inspect', id: 'mb:aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa' });
+    expect(await screen.findByRole('heading', { name: 'Which record did you mean?' })).toBeInTheDocument();
+    expect(screen.getByText('Exact name')).toBeInTheDocument();
+    expect(screen.getByText('Mentioned under another name')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Choose Young Solo, Separate listing' }));
+    expect(await screen.findByText('Working brief. Not an AI analysis. No model was called and no audio was measured.')).toBeInTheDocument();
+    expect(screen.getByText('Young Solo is a MusicBrainz person record.')).toBeInTheDocument();
+    expect(screen.queryByText(/Fixture report/)).not.toBeInTheDocument();
+    await user.type(screen.getByLabelText(/Paste at most/), 'hold the lane\nhold the lane');
+    expect(screen.getByText('lane')).toBeInTheDocument();
+    expect(screen.getAllByText('2 times').length).toBeGreaterThan(0);
+    await user.type(screen.getByLabelText('Note'), 'Ordinary objects do the work.');
+    await user.click(screen.getByRole('button', { name: 'Add note' }));
+    expect(screen.getByText('Ordinary objects do the work.')).toBeInTheDocument();
+    vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:brief');
+    vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
+    const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+    await user.click(screen.getByRole('button', { name: 'Download research brief' }));
+    expect(click).toHaveBeenCalled();
   });
 
-  it('renders a fixture report with diagrams and hides an unsafe payload', async () => {
-    const report = buildFixtureReport();
+  it('offers search links when the name is unknown and hides a model payload', async () => {
     const fetchMock = vi.fn()
-      .mockResolvedValueOnce(json({ ok: true, status: 'report', report }))
-      .mockResolvedValueOnce(json({ ok: true, status: 'report', report: { ...report, bpm: 140, sections: report.sections.map((section) => ({ ...section, claims: section.claims.map((claim) => ({ ...claim, text: 'THIS SHOULD NOT RENDER' })) })) } }));
-    vi.stubGlobal('fetch', fetchMock);
-    const user = userEvent.setup();
-    const view = render(<ResearchWorkspace providerReport={getResearchProviderReport({ ARTIST_RESEARCH_SYNTHESIS_PROVIDER: 'openai' })} />);
-    await user.type(screen.getByLabelText('Artist name or catalog link'), 'Fixture MC');
-    await user.click(screen.getByRole('button', { name: 'Look up artist' }));
-    expect(await screen.findByText('Fixture report. This was not produced by a live lookup.')).toBeInTheDocument();
-    expect(screen.getByText('End rhyme')).toBeInTheDocument();
-    expect(screen.getByText('Setup')).toBeInTheDocument();
-    expect(screen.getAllByText('Source quotation').length).toBeGreaterThan(0);
-    expect(screen.getByText('Model interpretation')).toBeInTheDocument();
-    expect(screen.getByText(/not a bar, BPM, or waveform measurement/i)).toBeInTheDocument();
-    expect(screen.queryByText(/radar/i)).not.toBeInTheDocument();
-    view.unmount();
-    render(<ResearchWorkspace providerReport={getResearchProviderReport({})} />);
-    await user.type(screen.getByLabelText('Artist name or catalog link'), 'Fixture MC');
-    await user.click(screen.getByRole('button', { name: 'Look up artist' }));
-    expect(await screen.findByText(/display check/)).toBeInTheDocument();
-    expect(screen.queryByText('THIS SHOULD NOT RENDER')).not.toBeInTheDocument();
-  });
-
-  it('shows unknown and unavailable states from the service', async () => {
-    const fetchMock = vi.fn()
-      .mockResolvedValueOnce(json({ ok: false, status: 'unknown', message: 'No MusicBrainz or English Wikipedia record matched that name. Nothing was invented in its place.' }))
-      .mockResolvedValueOnce(json({ ok: false, status: 'provider_unavailable', provider: 'musicbrainz', message: 'The catalog timed out. No substitute artist or analysis was added.' }));
+      .mockResolvedValueOnce(json({ ok: false, status: 'unknown', message: 'No catalog record uses that name. Nothing was invented in its place.' }))
+      .mockResolvedValueOnce(json({ ok: true, status: 'report', report: { label: 'fixture', audioMeasured: false } }));
     vi.stubGlobal('fetch', fetchMock);
     const user = userEvent.setup();
     const view = render(<ResearchWorkspace providerReport={getResearchProviderReport({})} />);
     await user.type(screen.getByLabelText('Artist name or catalog link'), 'missing person');
     await user.click(screen.getByRole('button', { name: 'Look up artist' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('Nothing was invented');
+    expect(await screen.findByRole('heading', { name: 'No exact catalog name' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'English Wikipedia search' })).toHaveAttribute('href', expect.stringContaining('https://en.wikipedia.org/'));
     view.unmount();
     render(<ResearchWorkspace providerReport={getResearchProviderReport({})} />);
-    await user.clear(screen.getByLabelText('Artist name or catalog link'));
-    await user.type(screen.getByLabelText('Artist name or catalog link'), 'offline artist');
+    await user.type(screen.getByLabelText('Artist name or catalog link'), 'Fixture MC');
     await user.click(screen.getByRole('button', { name: 'Look up artist' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('No substitute artist');
+    expect(await screen.findByText(/was not shown/)).toBeInTheDocument();
+    expect(screen.queryByText(/Fixture report/)).not.toBeInTheDocument();
   });
 });
 
