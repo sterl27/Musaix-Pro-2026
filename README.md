@@ -69,7 +69,7 @@ MUSAIX_AUDIO_API_URL=http://localhost:8080
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
-`/research` reads public MusicBrainz, English Wikipedia, and Wikidata. It does not call Vercel AI Gateway, OpenAI, or Gemini, even if those variables are filled in. Craft synthesis stays off. See `docs/artist-research.md`.
+`/research` reads public MusicBrainz, English Wikipedia, and Wikidata, then lets you keep notes and count a short passage you supply. It does not call Vercel AI Gateway, OpenAI, or Gemini, and it does not write an artist analysis. See `docs/artist-research.md`.
 
 ## Supabase
 

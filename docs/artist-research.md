@@ -12,7 +12,9 @@ The lookup calls only:
 
 Those are public catalog requests. They do not bill a model provider. Redirects are not followed, lyric-host links are rejected, and response bodies are size-capped. The page shows the catalog identity and the short text those services returned. That text is labeled as source material, not as a craft conclusion.
 
-Catalog biographies are not treated as evidence of rhyme, punchlines, hooks, or delivery. The API returns `insufficient_sources` and does not generate a report.
+Catalog biographies are not treated as evidence of rhyme, punchlines, hooks, or delivery. The page still opens a working brief: the fetched catalog text, search links that are not read, notes you type, and counts of a short passage you supply. Those counts describe the paste. They are not rhyme quality, timing, or a recording measurement. Download writes a Markdown file in the browser. Nothing is saved to Supabase.
+
+Generated artist analysis remains unavailable. The page does not display a model report, including a fixture report.
 
 ## Why craft synthesis is off
 

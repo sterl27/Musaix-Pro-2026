@@ -23,6 +23,8 @@ export type EvidenceLayer = (typeof EVIDENCE_LAYERS)[number];
 
 export type CatalogLink = { label: string; href: string };
 
+export type NameMatch = 'exact' | 'phrase' | 'alias' | 'mention';
+
 export type ArtistCandidate = {
   id: string;
   name: string;
@@ -31,6 +33,8 @@ export type ArtistCandidate = {
   area: string;
   blurb: string;
   urls: CatalogLink[];
+  match?: NameMatch;
+  aliases?: string[];
 };
 
 export type PublicIdentity = {
@@ -40,6 +44,7 @@ export type PublicIdentity = {
   kind: string;
   area: string;
   urls: CatalogLink[];
+  aliases?: string[];
 };
 
 export type PublicSource = {

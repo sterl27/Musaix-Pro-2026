@@ -59,15 +59,16 @@ export async function resolveQuery(raw: unknown, deps: ResearchDeps, options?: {
     return { ok: false, status: 'unknown', message: 'No MusicBrainz or English Wikipedia record matched that name. Nothing was invented in its place.' };
   }
   const wanted = normalizeName(parsed.text);
-  const exact = found.candidates.filter((candidate) => normalizeName(candidate.name) === wanted);
-  if (found.candidates.length === 1 && exact.length === 1) return inspectArtist(exact[0].id, deps, options);
+  const sole = found.candidates.length === 1 ? found.candidates[0] : null;
+  const soleIsExact = Boolean(sole && !found.truncated && (sole.match === 'exact' || (sole.match === undefined && normalizeName(sole.name) === wanted)));
+  if (sole && soleIsExact) return inspectArtist(sole.id, deps, options);
   return {
     ok: false,
     status: 'disambiguation',
     query: parsed.text,
     candidates: found.candidates,
     truncated: found.truncated,
-    message: 'More than one catalog record could fit that name. Similar names stay separate until you choose one.',
+    message: 'More than one catalog record could fit. Exact names stay separate from looser mentions until you choose.',
   };
 }
 
