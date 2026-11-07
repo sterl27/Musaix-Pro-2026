@@ -15,6 +15,9 @@ export default function HomePage() {
           <Link href="/canvas" className="inline-flex rounded-xl border border-[#4d3d31] px-5 py-3 text-sm font-black uppercase tracking-widest text-[#ffb26f] hover:bg-[#1a1511]">
             Open Canvas
           </Link>
+          <Link href="/research" className="inline-flex rounded-xl border border-[#4d3d31] px-5 py-3 text-sm font-black uppercase tracking-widest text-[#ffb26f] hover:bg-[#1a1511]">
+            Artist research
+          </Link>
         </div>
       </section>
     </main>

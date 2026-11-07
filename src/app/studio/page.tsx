@@ -176,7 +176,10 @@ export default function StudioPage() {
 
               <div className="mt-16 flex items-center justify-between border-t border-[#4a3d31] pt-7">
                 <div className="text-3xl font-black uppercase text-white">Musaix <span className="rounded border border-[#d69357] px-1 text-xs text-[#d69357]">PRO</span></div>
-                <Link href="/canvas" className="rounded-md border border-[#5a4738] px-4 py-2 text-xs font-black uppercase tracking-widest text-[#ffb26f] hover:bg-[#ffb26f] hover:text-black">Canvas</Link>
+                <span className="flex gap-2">
+                  <Link href="/research" className="rounded-md border border-[#5a4738] px-4 py-2 text-xs font-black uppercase tracking-widest text-[#ffb26f] hover:bg-[#ffb26f] hover:text-black">Research</Link>
+                  <Link href="/canvas" className="rounded-md border border-[#5a4738] px-4 py-2 text-xs font-black uppercase tracking-widest text-[#ffb26f] hover:bg-[#ffb26f] hover:text-black">Canvas</Link>
+                </span>
               </div>
             </section>
 

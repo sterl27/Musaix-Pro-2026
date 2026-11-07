@@ -47,7 +47,9 @@ No agent swarm yet. No Pinecone, Chroma, Spotify OAuth, Ableton bridge, Google D
 
 - `/` — launch page
 - `/canvas` — Musaix Canvas
+- `/research` — public artist lookup. Catalog only; craft synthesis is off
 - `/api/generate-prompt` — structured prompt generation route
+- `/api/artist-research` — MusicBrainz / Wikipedia / Wikidata lookup. No model call
 
 ## Services
 
@@ -66,6 +68,8 @@ OPENAI_API_KEY=
 MUSAIX_AUDIO_API_URL=http://localhost:8080
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
+
+`/research` reads public MusicBrainz, English Wikipedia, and Wikidata. It does not call Vercel AI Gateway, OpenAI, or Gemini, even if those variables are filled in. Craft synthesis stays off. See `docs/artist-research.md`.
 
 ## Supabase
 
