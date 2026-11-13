@@ -69,6 +69,23 @@ MUSAIX_AUDIO_API_URL=http://localhost:8080
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
+```env
+# Sentry (optional). Leave unset to disable error tracking completely.
+NEXT_PUBLIC_SENTRY_DSN=
+SENTRY_DSN=
+SENTRY_AUTH_TOKEN=
+SENTRY_ORG=
+SENTRY_PROJECT=
+SENTRY_RELEASE=
+SENTRY_ENVIRONMENT=
+```
+
+Sentry is off unless a DSN is set. The Next.js app reads `NEXT_PUBLIC_SENTRY_DSN` or `SENTRY_DSN`. Source map upload happens only when `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, and `SENTRY_PROJECT` are all set; otherwise the build still succeeds and public source maps are not emitted. The release is `VERCEL_GIT_COMMIT_SHA` (or the current git SHA). Session Replay is off. Do not send PII.
+
+Set the Next.js variables on the Vercel project `musaix-pro-2026` (team `sterl27`), Production and Preview. Use one Sentry project for the web app. `SENTRY_AUTH_TOKEN` is a secret (org auth token with `project:releases` and source map upload). `SENTRY_ORG` and `SENTRY_PROJECT` are the Sentry slugs, not names.
+
+The Python audio service at `services/audio-api` reads `SENTRY_DSN` in its own environment (the intended deploy target is Cloud Run; Fly.io or Render also work). It does not start Sentry when that variable is unset. Release is `SENTRY_RELEASE`, or `GIT_SHA`, or Cloud Run's `K_REVISION`. Environment is `SENTRY_ENVIRONMENT` (or `ENVIRONMENT`, or `production` when `K_SERVICE` is set). Use a separate Sentry project for the audio API if you want to split quotas.
+
 `/research` reads public MusicBrainz, English Wikipedia, and Wikidata, then lets you keep notes and count a short passage you supply. It does not call Vercel AI Gateway, OpenAI, or Gemini, and it does not write an artist analysis. See `docs/artist-research.md`.
 
 ## Supabase

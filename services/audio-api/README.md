@@ -65,3 +65,16 @@ Planned response:
 ## Deployment Target
 
 Use Google Cloud Run, Fly.io, or Render. Do not force heavy audio processing into Vercel serverless functions.
+
+## Error tracking
+
+Sentry is optional. If `SENTRY_DSN` is unset, the SDK is not initialized.
+
+```env
+SENTRY_DSN=
+SENTRY_RELEASE=
+SENTRY_ENVIRONMENT=
+GIT_SHA=
+```
+
+Release is `SENTRY_RELEASE`, then `GIT_SHA`, then Cloud Run's `K_REVISION`. Environment is `SENTRY_ENVIRONMENT` or `ENVIRONMENT`, and falls back to `production` when `K_SERVICE` is set. PII is not sent. Set these on the Cloud Run (or Fly.io / Render) service, not on the Vercel web project, unless you intentionally share a DSN.
