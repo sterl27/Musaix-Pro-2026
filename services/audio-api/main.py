@@ -10,6 +10,10 @@ import numpy as np
 from fastapi import FastAPI, File, HTTPException, UploadFile, status
 from pydantic import BaseModel
 
+from sentry_init import init_sentry
+
+init_sentry()
+
 app = FastAPI(title="Musaix Audio API", version="0.1.0")
 
 UPLOAD_CHUNK_BYTES = 1024 * 1024
