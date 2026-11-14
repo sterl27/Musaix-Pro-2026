@@ -46,6 +46,13 @@
   textarea::placeholder {
     color: var(--color-gray-400);
   }
+
+  /* Keep this in the base layer. Unlayered `font` would beat every layered text and font utility. */
+  button,
+  input,
+  textarea {
+    font: inherit;
+  }
 }
 
 html,
@@ -58,10 +65,4 @@ body {
 
 body {
   font-family: Arial, Helvetica, sans-serif;
-}
-
-button,
-input,
-textarea {
-  font: inherit;
 }
