@@ -288,7 +288,7 @@ export function MusaixCanvas() {
   return (
     <main className="min-h-screen bg-[#07070a] px-5 py-6 text-zinc-100 md:px-8">
       <div className="mx-auto max-w-7xl">
-        <header className="mb-6 rounded-3xl border border-zinc-800 bg-gradient-to-br from-zinc-950 to-zinc-900 p-6 shadow-2xl">
+        <header className="mb-6 rounded-3xl border border-zinc-800 bg-linear-to-br from-zinc-950 to-zinc-900 p-6 shadow-2xl">
           <p className="text-xs uppercase tracking-[0.35em] text-pink-400">Musaix Pro v0.1</p>
           <div className="mt-3 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div>
@@ -319,27 +319,27 @@ export function MusaixCanvas() {
               <div className="grid gap-4 md:grid-cols-2">
                 <label className="block">
                   <span className="mb-2 block text-sm font-medium text-zinc-300">Project</span>
-                  <input value={projectName} onChange={(event) => setProjectName(event.target.value)} className="w-full rounded-xl border border-zinc-800 bg-zinc-900 p-3 text-sm text-zinc-100 outline-none focus:border-pink-500" />
+                  <input value={projectName} onChange={(event) => setProjectName(event.target.value)} className="w-full rounded-xl border border-zinc-800 bg-zinc-900 p-3 text-sm text-zinc-100 outline-hidden focus:border-pink-500" />
                 </label>
 
                 <label className="block">
                   <span className="mb-2 block text-sm font-medium text-zinc-300">Project Notes</span>
-                  <input value={projectDescription} onChange={(event) => setProjectDescription(event.target.value)} className="w-full rounded-xl border border-zinc-800 bg-zinc-900 p-3 text-sm text-zinc-100 outline-none focus:border-pink-500" />
+                  <input value={projectDescription} onChange={(event) => setProjectDescription(event.target.value)} className="w-full rounded-xl border border-zinc-800 bg-zinc-900 p-3 text-sm text-zinc-100 outline-hidden focus:border-pink-500" />
                 </label>
 
                 <label className="block">
                   <span className="mb-2 block text-sm font-medium text-zinc-300">Title</span>
-                  <input value={title} onChange={(event) => setTitle(event.target.value)} className="w-full rounded-xl border border-zinc-800 bg-zinc-900 p-3 text-sm text-zinc-100 outline-none focus:border-pink-500" />
+                  <input value={title} onChange={(event) => setTitle(event.target.value)} className="w-full rounded-xl border border-zinc-800 bg-zinc-900 p-3 text-sm text-zinc-100 outline-hidden focus:border-pink-500" />
                 </label>
 
                 <label className="block">
                   <span className="mb-2 block text-sm font-medium text-zinc-300">Artist / Source</span>
-                  <input value={artist} onChange={(event) => setArtist(event.target.value)} className="w-full rounded-xl border border-zinc-800 bg-zinc-900 p-3 text-sm text-zinc-100 outline-none focus:border-pink-500" />
+                  <input value={artist} onChange={(event) => setArtist(event.target.value)} className="w-full rounded-xl border border-zinc-800 bg-zinc-900 p-3 text-sm text-zinc-100 outline-hidden focus:border-pink-500" />
                 </label>
 
                 <label className="block">
                   <span className="mb-2 block text-sm font-medium text-zinc-300">Source Type</span>
-                  <select value={sourceType} onChange={(event) => setSourceType(event.target.value as SourceType)} className="w-full rounded-xl border border-zinc-800 bg-zinc-900 p-3 text-sm text-zinc-100 outline-none focus:border-pink-500">
+                  <select value={sourceType} onChange={(event) => setSourceType(event.target.value as SourceType)} className="w-full rounded-xl border border-zinc-800 bg-zinc-900 p-3 text-sm text-zinc-100 outline-hidden focus:border-pink-500">
                     <option value="song">Song</option>
                     <option value="artist">Artist</option>
                     <option value="style">Style</option>
@@ -350,17 +350,17 @@ export function MusaixCanvas() {
 
                 <label className="block">
                   <span className="mb-2 block text-sm font-medium text-zinc-300">Mood</span>
-                  <input value={mood} onChange={(event) => setMood(event.target.value)} className="w-full rounded-xl border border-zinc-800 bg-zinc-900 p-3 text-sm text-zinc-100 outline-none focus:border-pink-500" />
+                  <input value={mood} onChange={(event) => setMood(event.target.value)} className="w-full rounded-xl border border-zinc-800 bg-zinc-900 p-3 text-sm text-zinc-100 outline-hidden focus:border-pink-500" />
                 </label>
 
                 <label className="block md:col-span-2">
                   <span className="mb-2 block text-sm font-medium text-zinc-300">Constraints</span>
-                  <input value={constraints} onChange={(event) => setConstraints(event.target.value)} className="w-full rounded-xl border border-zinc-800 bg-zinc-900 p-3 text-sm text-zinc-100 outline-none focus:border-pink-500" />
+                  <input value={constraints} onChange={(event) => setConstraints(event.target.value)} className="w-full rounded-xl border border-zinc-800 bg-zinc-900 p-3 text-sm text-zinc-100 outline-hidden focus:border-pink-500" />
                 </label>
 
                 <label className="block md:col-span-2">
                   <span className="mb-2 block text-sm font-medium text-zinc-300">Source Text</span>
-                  <textarea rows={14} value={sourceText} onChange={(event) => setSourceText(event.target.value)} className="w-full rounded-xl border border-zinc-800 bg-zinc-900 p-3 text-sm text-zinc-100 outline-none focus:border-pink-500" />
+                  <textarea rows={14} value={sourceText} onChange={(event) => setSourceText(event.target.value)} className="w-full rounded-xl border border-zinc-800 bg-zinc-900 p-3 text-sm text-zinc-100 outline-hidden focus:border-pink-500" />
                 </label>
               </div>
             </section>

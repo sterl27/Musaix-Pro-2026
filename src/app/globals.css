@@ -1,6 +1,59 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss' source(none);
+
+/* Same files the v3 `content` array scanned. The unused root app is outside this set. */
+@source './**/*.{ts,tsx}';
+@source '../components/**/*.{ts,tsx}';
+@source '../lib/**/*.{ts,tsx}';
+
+@theme {
+  --color-accent: #ee2b5b;
+  /* v3 set `violet` to a single hex, which replaced the numbered scale.
+     `bg-violet-600` therefore emitted no CSS. Drop the scale so that stays true. */
+  --color-violet-*: initial;
+  --color-violet: #8b5cf6;
+  /* v4 redraws these in OKLCH. Pin the steps this UI uses so pink and cyan stay put. */
+  --color-pink-300: #f9a8d4;
+  --color-pink-400: #f472b6;
+  --color-pink-500: #ec4899;
+  --color-pink-600: #db2777;
+  --color-cyan-300: #67e8f9;
+  --color-gray-400: #9ca3af;
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--color-gray-400);
+  }
+
+  /* Keep this in the base layer. Unlayered `font` would beat every layered text and font utility. */
+  button,
+  input,
+  textarea {
+    font: inherit;
+  }
+}
 
 html,
 body {
@@ -12,10 +65,4 @@ body {
 
 body {
   font-family: Arial, Helvetica, sans-serif;
-}
-
-button,
-input,
-textarea {
-  font: inherit;
 }
