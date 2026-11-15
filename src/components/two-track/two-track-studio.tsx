@@ -23,7 +23,7 @@ const C = { bg: '#0b0b0a', grid: '#3c332b', fg: '#eee2cd', muted: '#8f7b67', amb
 const btn = 'inline-flex items-center gap-1.5 rounded-md border border-[#5a4738] px-3 py-1.5 text-[11px] font-black uppercase tracking-widest text-[#ffb26f] transition hover:bg-[#ffb26f] hover:text-black disabled:pointer-events-none disabled:opacity-40';
 const btnOn = 'border-[#ffb26f] bg-[#ffb26f] text-black';
 const btnPrimary = 'border-[#ffb26f] bg-[#ffb26f] text-black hover:bg-[#ffd19d]';
-const field = 'rounded-md border border-[#2d2927] bg-black/70 px-2 py-1 text-sm text-[#eee2cd] focus:border-[#ffb26f] focus:outline-none disabled:opacity-50';
+const field = 'rounded-md border border-[#2d2927] bg-black/70 px-2 py-1 text-sm text-[#eee2cd] focus:border-[#ffb26f] focus:outline-hidden disabled:opacity-50';
 const label = 'flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#cdb8a1]';
 const range = 'accent-[#ffb26f]';
 const panel = 'rounded-md border border-[#514334] bg-[#171514]/92 p-4';
@@ -415,7 +415,7 @@ export function TwoTrackStudio() {
             className={cn(btn, 'border-[#d94e4e] px-4 py-2 text-xs text-[#ff8a7a] hover:bg-[#d94e4e] hover:text-black', recState === 'armed' && 'animate-pulse bg-[#d94e4e]/40 text-[#ffe0d8]', recording && 'bg-[#d94e4e] text-black')}>
             <span aria-hidden>●</span>{recState === 'idle' ? 'Rec' : recState === 'armed' ? 'Armed' : 'Rec…'}
           </button>
-          <span className="min-w-[4.5rem] rounded-md border border-[#2d2927] bg-black/70 px-3 py-1.5 text-center font-mono text-lg font-bold text-[#f3dfb9]" aria-label="Position (bar.beat)">{posText}</span>
+          <span className="min-w-18 rounded-md border border-[#2d2927] bg-black/70 px-3 py-1.5 text-center font-mono text-lg font-bold text-[#f3dfb9]" aria-label="Position (bar.beat)">{posText}</span>
           <span role="status" data-testid="status" className={cn('min-w-48 text-xs font-bold uppercase tracking-wider', recState === 'idle' ? 'text-[#9c8876]' : 'text-[#ff8a7a]')}>{status}</span>
         </div>
       </header>
@@ -456,7 +456,7 @@ export function TwoTrackStudio() {
             onDragLeave={() => setDragOver(false)}
             onDrop={e => { e.preventDefault(); setDragOver(false); onFiles(e.dataTransfer.files); }}>
             <div className="flex flex-wrap items-center gap-3">
-              <h3 className={heading}><span className="mr-2 rounded border border-[#ffb26f] px-1.5 text-[#ffb26f]">1</span>Beat</h3>
+              <h3 className={heading}><span className="mr-2 rounded-sm border border-[#ffb26f] px-1.5 text-[#ffb26f]">1</span>Beat</h3>
               <div className="flex" role="radiogroup" aria-label="Beat source">
                 <button type="button" role="radio" aria-checked={beatMode === 'seq'} className={cn(btn, 'rounded-r-none', beatMode === 'seq' && btnOn)} disabled={recLocked} onClick={() => setBeatMode('seq')} data-testid="mode-seq">Step sequencer</button>
                 <button type="button" role="radio" aria-checked={beatMode === 'audio'} className={cn(btn, '-ml-px rounded-l-none', beatMode === 'audio' && btnOn)} disabled={recLocked} onClick={() => setBeatMode('audio')} data-testid="mode-audio">Audio beat</button>
@@ -486,8 +486,8 @@ export function TwoTrackStudio() {
                       <span className="self-center text-[10px] font-black uppercase tracking-widest text-[#cdb8a1]">{d.name}</span>
                       {pattern[d.id].map((on, i) => (
                         <button type="button" key={i} data-testid={`cell-${d.id}-${i}`} aria-label={`${d.name} step ${i + 1}`} aria-pressed={on} onClick={() => toggleCell(d.id, i)}
-                          className={cn('h-8 rounded border transition', on ? 'border-[#ead28f] bg-[#b6ff83] shadow-[0_0_12px_rgba(223,255,135,0.35)]' : Math.floor(i / 4) % 2 ? 'border-[#3c332b] bg-[#24201b] hover:bg-[#2f2923]' : 'border-[#3c332b] bg-[#161412] hover:bg-[#241f1a]',
-                            pos.step === i && pos.bar >= 0 && 'outline outline-1 outline-[#ffb26f]')} />
+                          className={cn('h-8 rounded-sm border transition', on ? 'border-[#ead28f] bg-[#b6ff83] shadow-[0_0_12px_rgba(223,255,135,0.35)]' : Math.floor(i / 4) % 2 ? 'border-[#3c332b] bg-[#24201b] hover:bg-[#2f2923]' : 'border-[#3c332b] bg-[#161412] hover:bg-[#241f1a]',
+                            pos.step === i && pos.bar >= 0 && 'outline-solid outline-1 outline-[#ffb26f]')} />
                       ))}
                     </div>
                   ))}
@@ -533,7 +533,7 @@ export function TwoTrackStudio() {
           {/* Track 2: recording */}
           <section aria-label="Track 2 recording" className={panel}>
             <div className="flex flex-wrap items-center gap-3">
-              <h3 className={heading}><span className="mr-2 rounded border border-[#d94e4e] px-1.5 text-[#ff8a7a]">2</span>Rec</h3>
+              <h3 className={heading}><span className="mr-2 rounded-sm border border-[#d94e4e] px-1.5 text-[#ff8a7a]">2</span>Rec</h3>
               <button type="button" className={btn} onClick={() => void enableMic()}><Mic className="h-3.5 w-3.5" />{micName ? 'Mic ✓' : 'Enable mic'}</button>
               <Check checked={monitor} onChange={setMonitor} title="Hear the mic live (use headphones!)">Monitor</Check>
               <label className={label} title="Shifts the take earlier to compensate for round-trip latency; re-trims the last take live">Latency
@@ -560,8 +560,8 @@ export function TwoTrackStudio() {
               <span>Rec</span><input className={range} aria-label="Recording volume" type="range" min={0} max={1.5} step={0.01} value={vol.rec} onChange={e => setVol({ ...vol, rec: +e.target.value })} />
               <button type="button" aria-label="Mute recording" aria-pressed={mute.rec} className={cn(btn, 'px-2', mute.rec && btnOn)} onClick={() => setMute({ ...mute, rec: !mute.rec })}>M</button>
               <span>Master</span><input className={range} aria-label="Master volume" type="range" min={0} max={1.5} step={0.01} value={vol.master} onChange={e => setVol({ ...vol, master: +e.target.value })} /><span />
-              <span>Out</span><canvas ref={masterRef} width={240} height={10} aria-label="Master level meter" className="h-2.5 w-full rounded-sm border border-[#3d3128]" /><span />
-              <span>Mic</span><canvas ref={micRef} width={240} height={10} aria-label="Mic level meter" className="h-2.5 w-full rounded-sm border border-[#3d3128]" /><span />
+              <span>Out</span><canvas ref={masterRef} width={240} height={10} aria-label="Master level meter" className="h-2.5 w-full rounded-xs border border-[#3d3128]" /><span />
+              <span>Mic</span><canvas ref={micRef} width={240} height={10} aria-label="Mic level meter" className="h-2.5 w-full rounded-xs border border-[#3d3128]" /><span />
             </div>
             {micName && <p className="mt-2 truncate text-[10px] text-[#8f7b67]">{micName}</p>}
           </section>

@@ -47,7 +47,7 @@ function VuMeter({ label }: { label: string }) {
       <div className="absolute left-3 top-2 text-[9px] font-black text-[#2d271d]">{label}</div>
       <div className="absolute left-1/2 top-10 -translate-x-1/2 text-sm font-black text-[#4a3521]">VU</div>
       <div className="absolute left-1/2 top-12 h-14 w-32 -translate-x-1/2 rounded-t-full border-t border-dashed border-[#876f4f]" />
-      <div className="absolute bottom-8 left-14 h-1 w-20 origin-left rotate-[35deg] rounded-full bg-[#d94e4e] shadow-[0_0_10px_rgba(217,78,78,0.45)]" />
+      <div className="absolute bottom-8 left-14 h-1 w-20 origin-left rotate-35 rounded-full bg-[#d94e4e] shadow-[0_0_10px_rgba(217,78,78,0.45)]" />
     </div>
   );
 }
@@ -109,7 +109,7 @@ function ParticleCore() {
 export default function StudioPage() {
   return (
     <main className="min-h-screen bg-[#0b0b0a] text-[#eee2cd]">
-      <div className="flex min-h-screen overflow-hidden border-x border-[#352b23] bg-[linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px),radial-gradient(circle_at_top_left,rgba(247,167,93,0.11),transparent_34%),#090909] bg-[length:28px_28px,100%_100%,100%_100%]">
+      <div className="flex min-h-screen overflow-hidden border-x border-[#352b23] bg-[linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px),radial-gradient(circle_at_top_left,rgba(247,167,93,0.11),transparent_34%),#090909] bg-size-[28px_28px,100%_100%,100%_100%]">
         <aside className="flex w-24 flex-col items-center justify-between border-r border-[#3d3128] bg-[#11100f]/88 py-7">
           <div className="flex flex-col gap-10">
             {navItems.map(([name, Icon]) => (
@@ -164,8 +164,8 @@ export default function StudioPage() {
                   ))}
                 </div>
                 <div className="flex flex-col items-center justify-between pb-16 pt-6">
-                  <Knob label="Volume" rotate="-rotate-[36deg]" />
-                  <Knob label="Balance" rotate="rotate-[-90deg]" />
+                  <Knob label="Volume" rotate="rotate-[-36deg]" />
+                  <Knob label="Balance" rotate="-rotate-90" />
                 </div>
               </div>
 
@@ -175,7 +175,7 @@ export default function StudioPage() {
               </div>
 
               <div className="mt-16 flex items-center justify-between border-t border-[#4a3d31] pt-7">
-                <div className="text-3xl font-black uppercase text-white">Musaix <span className="rounded border border-[#d69357] px-1 text-xs text-[#d69357]">PRO</span></div>
+                <div className="text-3xl font-black uppercase text-white">Musaix <span className="rounded-sm border border-[#d69357] px-1 text-xs text-[#d69357]">PRO</span></div>
                 <span className="flex gap-2">
                   <Link href="/research" className="rounded-md border border-[#5a4738] px-4 py-2 text-xs font-black uppercase tracking-widest text-[#ffb26f] hover:bg-[#ffb26f] hover:text-black">Research</Link>
                   <Link href="/canvas" className="rounded-md border border-[#5a4738] px-4 py-2 text-xs font-black uppercase tracking-widest text-[#ffb26f] hover:bg-[#ffb26f] hover:text-black">Canvas</Link>
@@ -213,7 +213,7 @@ export default function StudioPage() {
                 <div className="grid grid-cols-3 gap-3">
                   {['YouTube Music', 'Spotify', 'SoundCloud'].map((service) => (
                     <div key={service} className="rounded-md border border-[#2e2a27] bg-black/60 p-3 text-center text-[10px] font-black uppercase text-white">
-                      <div className="mb-2 mx-auto h-7 w-7 rounded bg-white/90" />
+                      <div className="mb-2 mx-auto h-7 w-7 rounded-sm bg-white/90" />
                       {service}
                     </div>
                   ))}

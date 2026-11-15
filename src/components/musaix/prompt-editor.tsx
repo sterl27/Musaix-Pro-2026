@@ -29,7 +29,7 @@ export function PromptEditor({ prompt, onChange }: PromptEditorProps) {
               rows={field.rows}
               value={String(prompt[field.key] ?? '')}
               onChange={(event) => onChange({ ...prompt, [field.key]: event.target.value })}
-              className="w-full rounded-xl border border-zinc-800 bg-zinc-900 p-3 text-sm text-zinc-100 outline-none ring-0 transition placeholder:text-zinc-600 focus:border-pink-500"
+              className="w-full rounded-xl border border-zinc-800 bg-zinc-900 p-3 text-sm text-zinc-100 outline-hidden ring-0 transition placeholder:text-zinc-600 focus:border-pink-500"
             />
           </label>
         ))}

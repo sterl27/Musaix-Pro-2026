@@ -47,10 +47,10 @@ export default function HomePage() {
           <Badge variant="outline" className="w-fit border-primary/40 bg-transparent text-[11px] font-bold uppercase tracking-[0.28em] text-primary">
             Artist-first production suite
           </Badge>
-          <h1 className="mt-4 max-w-4xl text-4xl font-black leading-[1.05] tracking-tight text-foreground md:mt-5 md:text-5xl 2xl:text-6xl">
+          <h1 className="mt-4 max-w-4xl text-4xl font-black leading-[1.05] tracking-tight text-foreground md:mt-5 md:text-5xl md:leading-none 2xl:text-6xl">
             AI is the instrument, never the hand.
           </h1>
-          <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground md:mt-5 md:text-lg">
+          <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground md:mt-5 md:text-lg md:leading-7">
             Musaix Pro keeps the artist in the chair. Studio, Audio, Canvas, and Research are open.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -65,7 +65,7 @@ export default function HomePage() {
 
         <section aria-label="Rooms" className="grid grid-cols-1 gap-4 pb-2 md:grid-cols-2 md:gap-5 xl:grid-cols-4">
           {rooms.map((room) => (
-            <Link key={room.href} href={room.href} className="group block h-full rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            <Link key={room.href} href={room.href} className="group block h-full rounded-xl focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring">
               <Card className="h-full border-border bg-card/90 shadow-none transition-colors group-hover:border-primary group-hover:bg-accent">
                 <CardHeader className="gap-0 p-4 md:p-5">
                   <Badge variant="outline" className="w-fit border-primary/40 bg-transparent font-black tracking-[0.28em] text-primary">
