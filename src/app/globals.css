@@ -19,3 +19,26 @@ input,
 textarea {
   font: inherit;
 }
+
+:root {
+  --background: 240 18% 3%;
+  --foreground: 240 20% 97%;
+  --card: 30 6% 6%;
+  --card-foreground: 40 33% 93%;
+  --popover: 30 6% 6%;
+  --popover-foreground: 240 20% 97%;
+  --primary: 28 100% 72%;
+  --primary-foreground: 0 0% 0%;
+  --secondary: 345 85% 55%;
+  --secondary-foreground: 0 0% 100%;
+  --muted: 30 8% 12%;
+  --muted-foreground: 240 4% 65%;
+  --accent: 26 22% 14%;
+  --accent-foreground: 28 100% 72%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 26 22% 25%;
+  --input: 26 22% 25%;
+  --ring: 28 100% 72%;
+  --radius: 0.75rem;
+}

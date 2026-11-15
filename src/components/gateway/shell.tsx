@@ -29,9 +29,9 @@ export function GatewayFooter() {
     <footer className="gw-footer">
       <p>Musaix Pro. AI is the instrument, never the hand.</p>
       <nav aria-label="Footer">
-        <Link href="/#loop">The loop</Link>
-        <Link href="/#module-one">Module One</Link>
-        <Link href="/#workbench">Workbench</Link>
+        <Link href="/investors#loop">The loop</Link>
+        <Link href="/investors#module-one">Module One</Link>
+        <Link href="/investors#workbench">Workbench</Link>
         <Link href="/sign-in">Sign in</Link>
         <Link href="/sign-up?next=/brief">Get early access</Link>
         <Link href="/audio">Audio</Link>

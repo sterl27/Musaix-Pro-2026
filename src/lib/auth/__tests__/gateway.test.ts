@@ -28,8 +28,9 @@ describe('gateway auth helpers', () => {
     expect(authRedirect('/studio', true)).toBeNull();
   });
 
-  it('hides the player on the front door and auth pages', () => {
-    expect(isQuietRoute('/')).toBe(true);
+  it('hides the player on the investor page and auth pages', () => {
+    expect(isQuietRoute('/')).toBe(false);
+    expect(isQuietRoute('/investors')).toBe(true);
     expect(isQuietRoute('/sign-in')).toBe(true);
     expect(isQuietRoute('/auth/callback')).toBe(true);
     expect(isQuietRoute('/audio')).toBe(false);

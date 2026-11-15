@@ -1,5 +1,5 @@
 const QUIET = new Set([
-  '/',
+  '/investors',
   '/cockpit',
   '/brief',
   '/privacy',
