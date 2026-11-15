@@ -42,7 +42,7 @@ describe('Canvas save gating', () => {
     expect(await screen.findByText(/sign in/i, { selector: 'p' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Save Reference' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Save Prompt' })).toBeDisabled();
-    expect(screen.getByRole('link', { name: /sign in to save/i })).toHaveAttribute('href', '/audio');
+    expect(screen.getByRole('link', { name: /sign in to save/i })).toHaveAttribute('href', '/sign-in?next=/canvas');
   });
 
   it('saves when signed in and says so', async () => {

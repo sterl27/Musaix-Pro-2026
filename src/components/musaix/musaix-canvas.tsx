@@ -296,12 +296,15 @@ export function MusaixCanvas() {
               <p className="mt-3 max-w-3xl text-zinc-400">Locked build path: Reference → Prompt → Project → Export. Small, real, wired.</p>
             </div>
             <div className="rounded-2xl border border-zinc-800 bg-zinc-950/80 px-4 py-3 text-sm text-zinc-400">
-              Supabase: <span className="text-cyan-300">xexzplnyzblflucfvbwt</span>
-              {sessionStatus === 'signed-out' ? (
-                <Link href="/audio" className="ml-3 font-semibold text-pink-400 hover:text-pink-300">
+              {sessionStatus === 'signed-in' ? (
+                <span className="text-zinc-200">Signed in. Saves go to your project.</span>
+              ) : sessionStatus === 'unconfigured' ? (
+                <span>Cloud save is not configured on this deployment.</span>
+              ) : (
+                <Link href="/sign-in?next=/canvas" className="font-semibold text-pink-400 hover:text-pink-300">
                   Sign in to save →
                 </Link>
-              ) : null}
+              )}
             </div>
           </div>
         </header>

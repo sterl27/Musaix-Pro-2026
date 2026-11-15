@@ -6,7 +6,7 @@ import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/ca
 import { HomeNav, type HomeRoom } from '@/components/home/home-nav';
 
 export const metadata: Metadata = {
-  title: 'Musaix Pro',
+  title: { absolute: 'Musaix Pro' },
   description: 'Artist-first music production. AI is the instrument, never the hand. Studio, Audio, Canvas, and Research are live.',
 };
 
