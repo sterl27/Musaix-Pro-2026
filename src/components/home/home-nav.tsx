@@ -31,12 +31,12 @@ export function HomeNav({ rooms }: { rooms: readonly HomeRoom[] }) {
             <Menu />
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="w-full max-w-full border-border pb-28 sm:max-w-sm">
-          <SheetHeader className="pr-8 text-left">
+        <SheetContent side="left" className="flex h-full w-full max-w-full flex-col overflow-hidden border-border sm:max-w-sm">
+          <SheetHeader className="shrink-0 pr-8 text-left">
             <SheetTitle>Musaix Pro</SheetTitle>
             <SheetDescription>Four live rooms.</SheetDescription>
           </SheetHeader>
-          <nav aria-label="Mobile workspace" className="mt-8 flex flex-col gap-2">
+          <nav aria-label="Mobile workspace" className="mt-6 flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overscroll-contain pb-6">
             {rooms.map((room) => (
               <Link key={room.href} href={room.href} className="rounded-xl border border-border px-4 py-3 hover:border-primary hover:bg-accent">
                 <span className="block text-[10px] font-semibold uppercase tracking-[0.28em] text-primary">{room.index}</span>
