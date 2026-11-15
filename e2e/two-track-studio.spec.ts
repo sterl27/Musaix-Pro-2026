@@ -100,9 +100,9 @@ test('2-Track recorder: sequencer, count-in take, MP3 beat detection, mix + MIDI
   const full = readWav(out('mix-full.wav'));
   expect(Math.round(full.dur / ((4 * 60) / detBpm))).toBeGreaterThanOrEqual(8);
 
-  // Cloud library is feature-gated: unconfigured deployments say so; configured ones ask to sign in on Audio.
+  // Cloud library is feature-gated: unconfigured deployments say so; configured ones ask you to sign in.
   const cloud = page.getByTestId('cloud');
-  await expect(cloud.getByText(/isn.t configured|Sign in on Audio/)).toBeVisible();
+  await expect(cloud.getByText(/isn.t configured|Sign in/)).toBeVisible();
 
   expect(errors).toEqual([]);
 });

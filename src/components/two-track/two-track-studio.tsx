@@ -588,7 +588,7 @@ export function TwoTrackStudio() {
             {cloud === 'unconfigured' && <p className="mt-2 text-xs text-[#9c8876]" data-testid="cloud-msg">Cloud library isn&apos;t configured for this deployment. Recording, playback and exports work locally.</p>}
             {cloud === 'signed-out' && (
               <p className="mt-2 text-xs text-[#9c8876]" data-testid="cloud-msg">
-                <Link href="/audio" className="font-black uppercase tracking-widest text-[#ffb26f] hover:underline">Sign in on Audio</Link> to save takes and beats to your private library.
+                <Link href="/sign-in?next=/studio" className="font-black uppercase tracking-widest text-[#ffb26f] hover:underline">Sign in</Link> to save takes and beats to your private library.
               </p>
             )}
             {cloud === 'signed-in' && (
