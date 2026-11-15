@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { authErrorMessage, linkErrorMessage } from '@/lib/auth/errors';
+import { authErrorMessage, linkErrorMessage, passwordResetError } from '@/lib/auth/errors';
 import { originFromHost } from '@/lib/auth/origin';
 import { authRedirect, isQuietRoute, safeNext } from '@/lib/auth/paths';
 
@@ -10,7 +10,14 @@ describe('gateway auth helpers', () => {
     expect(safeNext('https://evil.example/brief')).toBe('/brief');
     expect(safeNext('//evil.example')).toBe('/brief');
     expect(safeNext('/\\evil')).toBe('/brief');
+    expect(safeNext('/\t/evil.example')).toBe('/brief');
+    expect(safeNext('/\n/evil.example')).toBe('/brief');
+    expect(safeNext('/\r/evil.example')).toBe('/brief');
     expect(safeNext(null, '/sign-in')).toBe('/sign-in');
+    for (const attack of ['/\t/evil.example', '/\n/evil.example', '//evil.example', 'https://evil.example']) {
+      const next = safeNext(attack);
+      expect(new URL(next, 'https://sterlai.com').origin).toBe('https://sterlai.com');
+    }
   });
 
   it('protects Module One and sends signed-in people past the auth pages', () => {
@@ -35,6 +42,9 @@ describe('gateway auth helpers', () => {
     expect(authErrorMessage({ code: 'over_request_rate_limit', message: 'rate limit' })).toMatch(/Wait a minute/);
     expect(authErrorMessage({ code: 'captcha_failed', message: 'captcha protection: request disallowed' })).toMatch(/captcha/);
     expect(authErrorMessage(new Error('database blew up'))).toBe('Something went wrong. Try again in a moment.');
+    expect(passwordResetError({ code: 'captcha_failed', message: 'captcha protection' })).toMatch(/captcha/);
+    expect(passwordResetError({ code: 'unexpected_failure', message: 'Error sending recovery email' })).toMatch(/could not send/i);
+    expect(passwordResetError({ code: 'user_not_found', message: 'User not found' })).toBeNull();
     expect(linkErrorMessage('link')).toMatch(/expired/);
     expect(linkErrorMessage('nope')).toBeUndefined();
   });

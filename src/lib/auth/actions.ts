@@ -2,7 +2,7 @@
 
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { authErrorMessage } from '@/lib/auth/errors';
+import { authErrorMessage, passwordResetError } from '@/lib/auth/errors';
 import { originFromHost } from '@/lib/auth/origin';
 import { safeNext } from '@/lib/auth/paths';
 import { createClient } from '@/lib/supabase/server';
@@ -111,8 +111,8 @@ export async function requestPasswordReset(_prev: AuthFormState, formData: FormD
     ...captchaFrom(formData)
   });
   if (error) {
-    const message = authErrorMessage(error);
-    if (message.startsWith('Too many')) return { status: 'error', error: message, email };
+    const message = passwordResetError(error);
+    if (message) return { status: 'error', error: message, email };
   }
   return {
     status: 'sent',

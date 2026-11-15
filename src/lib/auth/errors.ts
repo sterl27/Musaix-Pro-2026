@@ -3,6 +3,21 @@ const LINK_ERRORS: Record<string, string> = {
   confirm: 'We could not confirm that email. Request a new link and try again.'
 };
 
+/** Null means the reset form should show the generic "link is on the way" state. */
+export function passwordResetError(error: unknown): string | null {
+  const code = typeof error === 'object' && error && 'code' in error && typeof error.code === 'string' ? error.code : '';
+  const message =
+    error instanceof Error
+      ? error.message
+      : typeof error === 'object' && error && 'message' in error && typeof error.message === 'string'
+        ? error.message
+        : typeof error === 'string'
+          ? error
+          : '';
+  if (code === 'user_not_found' || message.toLowerCase().includes('user not found')) return null;
+  return authErrorMessage(error);
+}
+
 export function linkErrorMessage(code: string | undefined): string | undefined {
   if (!code) return undefined;
   return LINK_ERRORS[code];
@@ -38,6 +53,9 @@ export function authErrorMessage(error: unknown): string {
   }
   if (code === 'captcha_failed' || text.includes('captcha')) {
     return 'A captcha is required before this can go through, and this page does not have one yet.';
+  }
+  if (code === 'unexpected_failure' || text.includes('error sending') || text.includes('unable to send')) {
+    return 'We could not send that email. Try again in a moment.';
   }
   if (code === 'signup_disabled' || text.includes('signups not allowed')) {
     return 'New accounts are paused right now. Sign in if you already have one.';
