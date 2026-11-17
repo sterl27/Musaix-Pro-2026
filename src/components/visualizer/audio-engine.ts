@@ -69,11 +69,12 @@ export class VisualizerEngine {
     if (this.element) this.element.volume = this.volume;
   }
 
-  async useMicrophone(): Promise<void> {
+  /** Returns false when a newer source request superseded this one. */
+  async useMicrophone(): Promise<boolean> {
     if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
       throw new Error(MIC_UNSUPPORTED);
     }
-    const generation = this.generation;
+    const generation = this.claim();
     const context = this.ensureContext();
     let stream: MediaStream;
     try {
@@ -84,18 +85,27 @@ export class VisualizerEngine {
     } catch (error) {
       throw new Error(micErrorMessage(error));
     }
-    if (generation !== this.generation) {
-      for (const track of stream.getTracks()) track.stop();
-      return;
+    if (this.stale(generation)) {
+      stopStream(stream);
+      return false;
     }
     if (context.state === 'suspended') await context.resume();
-    if (generation !== this.generation) {
-      for (const track of stream.getTracks()) track.stop();
-      return;
+    if (this.stale(generation)) {
+      stopStream(stream);
+      return false;
     }
     try {
       const source = context.createMediaStreamSource(stream);
       this.releaseSource();
+      if (this.stale(generation)) {
+        try {
+          source.disconnect();
+        } catch {
+          /* Node was already disconnected. */
+        }
+        stopStream(stream);
+        return false;
+      }
       source.connect(this.analyser!);
       // The mic graph stops at the analyser. It is never connected to the speakers.
       this.routeAnalyser('mic');
@@ -103,8 +113,9 @@ export class VisualizerEngine {
       this.stream = stream;
       this.kind = 'mic';
       this.trackName = 'Microphone';
+      return true;
     } catch (error) {
-      for (const track of stream.getTracks()) track.stop();
+      stopStream(stream);
       throw error instanceof Error ? error : new Error(MIC_UNSUPPORTED);
     }
   }
@@ -113,7 +124,7 @@ export class VisualizerEngine {
   async useFile(file: File): Promise<boolean> {
     const issue = audioFileIssue(file.name);
     if (issue) throw new Error(issue);
-    const generation = this.generation;
+    const generation = this.claim();
     const context = this.ensureContext();
     const url = URL.createObjectURL(file);
     let element: HTMLAudioElement;
@@ -123,20 +134,20 @@ export class VisualizerEngine {
       URL.revokeObjectURL(url);
       throw error;
     }
-    if (generation !== this.generation) {
-      element.pause();
-      element.removeAttribute('src');
-      URL.revokeObjectURL(url);
+    if (this.stale(generation)) {
+      discardElement(element, url);
       return false;
     }
     if (context.state === 'suspended') await context.resume();
-    if (generation !== this.generation) {
-      element.pause();
-      element.removeAttribute('src');
-      URL.revokeObjectURL(url);
+    if (this.stale(generation)) {
+      discardElement(element, url);
       return false;
     }
     this.releaseSource();
+    if (this.stale(generation)) {
+      discardElement(element, url);
+      return false;
+    }
     const source = context.createMediaElementSource(element);
     const gain = context.createGain();
     element.volume = this.volume;
@@ -190,6 +201,16 @@ export class VisualizerEngine {
     this.context = null;
     this.analyser = null;
     if (context && context.state !== 'closed') void context.close();
+  }
+
+  /** Newer mic or file choices invalidate a request that is still waiting. */
+  private claim(): number {
+    this.generation += 1;
+    return this.generation;
+  }
+
+  private stale(generation: number): boolean {
+    return generation !== this.generation;
   }
 
   private ensureContext(): AudioContext {
@@ -247,6 +268,18 @@ export class VisualizerEngine {
     this.kind = 'idle';
     this.trackName = '';
   }
+}
+
+function stopStream(stream: MediaStream): void {
+  for (const track of stream.getTracks()) track.stop();
+}
+
+function discardElement(element: HTMLAudioElement, url: string): void {
+  element.onerror = null;
+  element.pause();
+  element.removeAttribute('src');
+  element.load();
+  URL.revokeObjectURL(url);
 }
 
 function loadMedia(url: string): Promise<HTMLAudioElement> {

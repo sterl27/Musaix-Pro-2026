@@ -5,7 +5,7 @@ import { useAudio } from '@/components/audio/audio-provider';
 import { readSensitivity, writeSensitivity, DEFAULT_SENSITIVITY } from '@/lib/visualizer/analysis';
 import { modeByKey, modeLabel, type ModeId } from '@/lib/visualizer/modes';
 import { nextTheme, THEMES, type ThemeId } from '@/lib/visualizer/themes';
-import { AUDIO_EXTENSIONS, type SourceKind } from '@/lib/visualizer/sources';
+import { AUDIO_EXTENSIONS, audioFileIssue, type SourceKind } from '@/lib/visualizer/sources';
 import { cn } from '@/lib/utils';
 import { VisualizerEngine } from './audio-engine';
 import { VisualizerControls } from './controls';
@@ -252,8 +252,8 @@ export function VisualizerStage() {
     const token = ++job.current;
     setNotice(null);
     try {
-      await engine.useMicrophone();
-      if (token !== job.current) return;
+      const installed = await engine.useMicrophone();
+      if (token !== job.current || !installed) return;
       view.paused = false;
       setSource('mic');
       setTrackName(engine.trackName);
@@ -268,6 +268,11 @@ export function VisualizerStage() {
     const engine = engineRef.current;
     const view = viewRef.current;
     if (!engine || !view) return;
+    const issue = audioFileIssue(file.name);
+    if (issue) {
+      setNotice({ tone: 'error', text: issue });
+      return;
+    }
     const token = ++job.current;
     setNotice(null);
     try {
