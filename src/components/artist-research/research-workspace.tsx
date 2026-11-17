@@ -92,6 +92,7 @@ export function ResearchWorkspace({ providerReport }: { providerReport: Provider
           <Link href="/research" aria-current="page">
             Research
           </Link>
+          <Link href="/visualizer">Visualizer</Link>
         </nav>
       </header>
       <p className="research-kicker">Public artist research</p>
