@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { authErrorMessage, linkErrorMessage, passwordResetError } from '@/lib/auth/errors';
 import { originFromHost } from '@/lib/auth/origin';
-import { authRedirect, isQuietRoute, safeNext } from '@/lib/auth/paths';
+import { authRedirect, hidesGlobalPlayer, isQuietRoute, safeNext } from '@/lib/auth/paths';
 
 describe('gateway auth helpers', () => {
   it('keeps same-origin next paths and drops open redirects', () => {
@@ -23,6 +23,8 @@ describe('gateway auth helpers', () => {
   it('protects Module One and sends signed-in people past the auth pages', () => {
     expect(authRedirect('/brief', false)).toBe('/sign-in?next=%2Fbrief');
     expect(authRedirect('/audio', false)).toBeNull();
+    expect(authRedirect('/research', false)).toBeNull();
+    expect(authRedirect('/visualizer', false)).toBeNull();
     expect(authRedirect('/sign-in', true, '/canvas')).toBe('/canvas');
     expect(authRedirect('/sign-up', true, 'https://evil.example')).toBe('/brief');
     expect(authRedirect('/studio', true)).toBeNull();
@@ -35,6 +37,10 @@ describe('gateway auth helpers', () => {
     expect(isQuietRoute('/auth/callback')).toBe(true);
     expect(isQuietRoute('/audio')).toBe(false);
     expect(isQuietRoute('/studio')).toBe(false);
+    expect(isQuietRoute('/visualizer')).toBe(false);
+    expect(hidesGlobalPlayer('/visualizer')).toBe(true);
+    expect(hidesGlobalPlayer('/audio')).toBe(false);
+    expect(hidesGlobalPlayer('/research')).toBe(false);
   });
 
   it('maps auth failures to plain language', () => {

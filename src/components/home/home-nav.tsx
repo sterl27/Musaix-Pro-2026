@@ -34,7 +34,7 @@ export function HomeNav({ rooms }: { rooms: readonly HomeRoom[] }) {
         <SheetContent side="left" className="flex h-full w-full max-w-full flex-col overflow-hidden border-border sm:max-w-sm">
           <SheetHeader className="shrink-0 pr-8 text-left">
             <SheetTitle>Musaix Pro</SheetTitle>
-            <SheetDescription>Four live rooms.</SheetDescription>
+            <SheetDescription>Five live rooms.</SheetDescription>
           </SheetHeader>
           <nav aria-label="Mobile workspace" className="mt-6 flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overscroll-contain pb-6">
             {rooms.map((room) => (

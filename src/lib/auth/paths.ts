@@ -12,6 +12,9 @@ const QUIET = new Set([
 
 const PROTECTED = new Set(['/brief']);
 
+/** The visualizer draws its own transport, so the global player stays out of the way. */
+const PLAYERLESS = new Set(['/visualizer']);
+
 const SAFE_ORIGIN = 'https://sterlai.com';
 
 /**
@@ -37,6 +40,10 @@ export function safeNext(value: string | null | undefined, fallback = '/brief'):
 export function isQuietRoute(pathname: string): boolean {
   if (QUIET.has(pathname)) return true;
   return pathname.startsWith('/auth/');
+}
+
+export function hidesGlobalPlayer(pathname: string): boolean {
+  return isQuietRoute(pathname) || PLAYERLESS.has(pathname);
 }
 
 /** Where the proxy should send this request, or null to continue. */

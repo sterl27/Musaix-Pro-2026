@@ -48,6 +48,7 @@ No agent swarm yet. No Pinecone, Chroma, Spotify OAuth, Ableton bridge, Google D
 - `/` — launch page
 - `/canvas` — Musaix Canvas
 - `/research` — public artist lookup. Catalog only; craft synthesis is off
+- `/visualizer` — public in-browser music visualizer (microphone or a local file)
 - `/api/generate-prompt` — structured prompt generation route
 - `/api/artist-research` — MusicBrainz / Wikipedia / Wikidata lookup. No model call
 
@@ -150,6 +151,27 @@ Configure the existing `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBL
 Use Node.js 22+ and `npm ci`. Verify with `npm run test:run`, `npm run typecheck`, `npm run lint`, and `npm run build`. For real media/navigation tests: `npx playwright install chromium`, `npm run build`, then `npm run test:e2e`. Tests generate an in-memory WAV; no private music is committed.
 
 The Next application lives in `src/`; legacy standalone demo files at the root are preserved but excluded from its typecheck. Metering, MIR reports, stems and agent interpretation remain later milestones. See `docs/audio-runtime-verification.md` for measured checks and limits.
+
+## Visualizer
+
+`/visualizer` is public, like `/audio` and `/research`. It listens with the Web Audio API and draws on a canvas in this browser. Nothing is uploaded.
+
+- **Microphone:** `getUserMedia` with echo cancellation, noise suppression, and auto gain off. The mic is analysed and is not routed to the speakers.
+- **File:** mp3, wav, ogg, m4a, or flac, from the picker or a drop. Playback goes to the speakers and the track name is shown.
+- **Modes (keys 1–4):** Bars, Circular, Loop, and Waveform, with a short crossfade. **T** cycles the theme, **F** toggles fullscreen, **Space** plays or pauses, and the arrow keys change sensitivity.
+- **Themes:** Neon, Sunset, Mono, Ocean, and Fire. Each theme sets the background, three gradient stops, and a glow color.
+
+### Add a mode
+
+1. Add an id, label, and key to `MODES` in `src/lib/visualizer/modes.ts`.
+2. Add `src/components/visualizer/renderers/<id>.ts` exporting a `ModeRenderer`.
+3. Register it in `src/components/visualizer/renderers/index.ts`.
+
+The stage crossfades to whatever is registered. The `key` on each mode is its shortcut, and the stage already dispatches it.
+
+### Add a theme
+
+Add an entry to `THEMES` in `src/lib/visualizer/themes.ts` with `background`, `stops` (three colors, low to high), `glow`, and `peak`. Put its id on `THEME_IDS`. The **T** key cycles that list. No other files need to change.
 
 ## 2-Track Recorder (Studio)
 

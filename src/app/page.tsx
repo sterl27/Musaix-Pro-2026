@@ -7,7 +7,7 @@ import { HomeNav, type HomeRoom } from '@/components/home/home-nav';
 
 export const metadata: Metadata = {
   title: { absolute: 'Musaix Pro' },
-  description: 'Artist-first music production. AI is the instrument, never the hand. Studio, Audio, Canvas, and Research are live.',
+  description: 'Artist-first music production. AI is the instrument, never the hand. Studio, Audio, Canvas, Research, and Visualizer are live.',
 };
 
 const rooms: readonly HomeRoom[] = [
@@ -35,6 +35,12 @@ const rooms: readonly HomeRoom[] = [
     name: 'Research',
     line: 'Look up a public artist record and keep your own notes. This room does not write an analysis.',
   },
+  {
+    href: '/visualizer',
+    index: '05',
+    name: 'Visualizer',
+    line: 'Watch the microphone or a local file as bars, rings, and waves. Nothing is uploaded.',
+  },
 ];
 
 export default function HomePage() {
@@ -51,7 +57,7 @@ export default function HomePage() {
             AI is the instrument, never the hand.
           </h1>
           <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground md:mt-5 md:text-lg md:leading-7">
-            Musaix Pro keeps the artist in the chair. Studio, Audio, Canvas, and Research are open.
+            Musaix Pro keeps the artist in the chair. Studio, Audio, Canvas, Research, and Visualizer are open.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button asChild size="lg" className="w-full font-black uppercase tracking-widest sm:w-auto">
@@ -63,7 +69,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section aria-label="Rooms" className="grid grid-cols-1 gap-4 pb-2 md:grid-cols-2 md:gap-5 xl:grid-cols-4">
+        <section aria-label="Rooms" className="grid grid-cols-1 gap-4 pb-2 md:grid-cols-2 md:gap-5 xl:grid-cols-5">
           {rooms.map((room) => (
             <Link key={room.href} href={room.href} className="group block h-full rounded-xl focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring">
               <Card className="h-full border-border bg-card/90 shadow-none transition-colors group-hover:border-primary group-hover:bg-accent">

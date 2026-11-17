@@ -116,6 +116,9 @@ export function LandingPage() {
               <li>
                 <Link href="/research">Research</Link> looks up public catalogs. No model call.
               </li>
+              <li>
+                <Link href="/visualizer">Visualizer</Link> reacts to a microphone or a local file. No upload.
+              </li>
             </ul>
           </article>
           <article className="gw-card">

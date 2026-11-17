@@ -38,6 +38,7 @@ export function GatewayFooter() {
         <Link href="/studio">Studio</Link>
         <Link href="/canvas">Canvas</Link>
         <Link href="/research">Research</Link>
+        <Link href="/visualizer">Visualizer</Link>
         <Link href="/privacy">Privacy</Link>
         <Link href="/terms">Terms</Link>
         <Link href="/cockpit">Build status</Link>
