@@ -1,7 +1,9 @@
 import { mkdirSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { expect, test } from '@playwright/test';
 
-const shots = '/opt/cursor/artifacts';
+const shots = path.join(path.dirname(fileURLToPath(import.meta.url)), 'screenshots');
 mkdirSync(shots, { recursive: true });
 
 const identity = {
